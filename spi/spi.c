@@ -186,3 +186,39 @@ static void spi_queue(void)
     }
 }
 #endif
+
+
+/*
+uint8_t spi_trans_multibyte(const unsigned char * ptr, uint8_t argc)
+{
+    uint8_t i;
+    uint8_t returned;
+    for(i = 0 ; i <= argc ; i++){
+        returned = spi_trans(*(ptr+i));
+        _delay_ms(30);
+}
+* void spi_preload(uint8_t data)        // for using with interrupt driven spi to receive data from slave in multibyte
+{
+    SPDR = data;
+}
+
+* */
+
+
+void spi_setSS(void)
+{
+    #if defined (SPI_SS_ACTIVE_LOW)
+        SPI_PORT &= ~(1<<SPI_SS);
+    #elif defined (SPI_SS_ACTIVE_HIGH)
+        SPI_PORT |= (1<<SPI_SS);
+    #endif
+}
+
+void spi_clearSS(void)
+{
+    #if defined (SPI_SS_ACTIVE_LOW)
+        SPI_PORT |= (1<<SPI_SS);
+    #elif defined (SPI_SS_ACTIVE_HIGH)
+        SPI_PORT &= ~(1<<SPI_SS);
+    #endif
+}

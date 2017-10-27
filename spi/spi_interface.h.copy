@@ -4,6 +4,10 @@
 #ifndef __SPI_INTERFACE
 #define __SPI_INTERFACE
 
+extern char spi_interface;
+
+// this can be ( 0 , 1 , 2 , 3 )
+#define SPI_MODE_x
 
 // MODE       : MASTER  -  SLAVE
 // PRESCALE   : 4  -  16  -  64  -  128
@@ -24,7 +28,24 @@
 #define SPI_INT_ENABLE          SPI_INT_OFF
 #define SPI_DATA_ORDER          SPI_LSB
 
+//#define SPI_SS_ACTIVE_LOW
+#define SPI_SS_ACTIVE_HIGH
+
 // uncomment this if you will use interrupt while in slave mode
 //#define INTE
+
+#if defined(SPI_MODE_0)
+    #define SPI_POLARITY            SPI_IDLE_LOW
+    #define SPI_SAMPLE_EDGE         SPI_SAMPLE_LEADING
+#elif defined(SPI_MODE_1)
+    #define SPI_POLARITY            SPI_IDLE_
+    #define SPI_SAMPLE_EDGE         SPI_SAMPLE_TRAILING
+#elif defined(SPI_MODE_2)
+    #define SPI_POLARITY            SPI_IDLE_HIGH
+    #define SPI_SAMPLE_EDGE         SPI_SAMPLE_LEADING
+#elif defined(SPI_MODE_3)
+    #define SPI_POLARITY            SPI_IDLE_HIGH
+    #define SPI_SAMPLE_EDGE         SPI_SAMPLE_TRAILING
+#endif
 
 #endif

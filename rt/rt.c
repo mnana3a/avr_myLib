@@ -6,7 +6,11 @@ void rt_init(void)
 {
     TIMSK |= (1<<1);    // timer 0 compare mode interrupt enable
     OCR0 = 249; // timer0 interrupts each 1 msec
-    TCCR0 |= (1<<3) | (1<<0) | (1<<1);
+    #if defined(__AVR_ATmega16__) || defined(__AVR_ATmega32__)
+        TCCR0 |= (1<<3) | (1<<0) | (1<<1);
+    #elif defined(__AVR_ATmega128__)
+        TCCR0 |= (1<<3) | (1<<2);
+    #endif
     sei();
 }
 

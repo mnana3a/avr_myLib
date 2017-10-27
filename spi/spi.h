@@ -1,3 +1,9 @@
+// NOTE: if the slave has other tasks to do in case of slave add a way instead of waiting for the master to start comm. use interrupt and set a flag in it.. in the super loop poll that flag to see if there is data use it otherwise move on and dont wait
+
+// NOTE: to add a flow control method to the spi, make the master ss pin as input and when the slave wants to communicate with the master it changes ss which will result in master mode changing into slave so you need to reset it to master again and respond to the slave
+
+// NOTE: keep in mind this chip(atmega32/16) doesn't recommend using the 2 divider for stability issues
+
 #ifndef __SPI_INCLUDED
 #define __SPI_INCLUDED
 
@@ -80,5 +86,7 @@ void spi_setSpeed(uint8_t speed);
 uint8_t spi_transfer(uint8_t _data);
 uint8_t spi_checkCollision(void);
 void spi_callbackFn(void (*ptrToSPI_ISR)(void));
+void spi_clearSS(void);
+void spi_setSS(void);
 
 #endif
