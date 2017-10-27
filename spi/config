@@ -1,0 +1,62 @@
+
+
+if (__config._spi_mode == SPI_MASTER)   SPCR |= (1<<MSTR);
+    else if (__config._spi_mode == SPI_SLAVE)   SPCR &= ~(1<<MSTR);
+    
+    if (__config._spi_prescaler == SPI_FOSC4 && __config._spi_speed == SPI_NORMAL)   
+    {
+        SPCR &= ~(1<<SPR0);
+        SPCR &= ~(1<<SPR1);
+        SPSR &= ~(1<<SPI2X);
+    }
+    else if (__config._spi_prescaler == SPI_FOSC4 && __config._spi_speed == SPI_DOUBLE)
+    {
+        SPCR &= ~(1<<SPR0);
+        SPCR &= ~(1<<SPR1);
+        SPSR |= (1<<SPI2X);
+    }
+    else if (__config._spi_prescaler == SPI_FOSC16 && __config._spi_speed == SPI_NORMAL)   
+    {
+        SPCR |= (1<<SPR0);
+        SPCR &= ~(1<<SPR1);
+        SPSR &= ~(1<<SPI2X);
+    }
+    else if (__config._spi_prescaler == SPI_FOSC16 && __config._spi_speed == SPI_DOUBLE)
+    {
+        SPCR |= (1<<SPR0);
+        SPCR &= ~(1<<SPR1);
+        SPSR |= (1<<SPI2X);
+    }
+    else if (__config._spi_prescaler == SPI_FOSC64 && __config._spi_speed == SPI_NORMAL)   
+    {
+        SPCR &= ~(1<<SPR0);
+        SPCR |= (1<<SPR1);
+        SPSR &= ~(1<<SPI2X);
+    }
+    else if (__config._spi_prescaler == SPI_FOSC64 && __config._spi_speed == SPI_DOUBLE)
+    {
+        SPCR &= ~(1<<SPR0);
+        SPCR |= (1<<SPR1);
+        SPSR |= (1<<SPI2X);
+    }
+    else if (__config._spi_prescaler == SPI_FOSC128 && __config._spi_speed == SPI_NORMAL)   
+    {
+        SPCR |= (1<<SPR0);
+        SPCR |= (1<<SPR1);
+        SPSR &= ~(1<<SPI2X);
+    }
+    
+    if (__config._spi_enable == SPI_ON) SPCR |= (1<<SPE);
+    else if (__config._spi_enable == SPI_OFF) SPCR &= ~(1<<SPE);
+    
+    if (__config._spi_polarity == SPI_IDLE_LOW) SPCR &= ~(1<<CPOL);
+    else if (__config._spi_polarity == SPI_IDLE_HIGH) SPCR |= (1<<CPOL);
+    
+    if (__config._spi_sampleEdge == SPI_SAMPLE_LEADING) SPCR &= ~(1<<CPHA);
+    else if (__config._spi_sampleEdge == SPI_SAMPLE_TRAILING) SPCR |= (1<<CPHA);
+    
+    if (__config._spi_intEnable == SPI_INT_ON)  SPCR |= (1<<SPIE);
+    else if (__config._spi_intEnable == SPI_INT_OFF)  SPCR &= ~(1<<SPIE);
+    
+    if (__config._spi_dataOrder == SPI_LSB) SPCR |= (1<<DORD);
+    else if (__config._spi_dataOrder == SPI_MSB) SPCR &= ~(1<<DORD);

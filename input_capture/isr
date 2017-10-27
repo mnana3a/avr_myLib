@@ -1,0 +1,66 @@
+#ifdef _PER_INT
+ISR(TIMER1_CAPT_vect)
+{
+	g_u8Counter++;
+
+	#if defined (__CAPTURE_GET_PERIOD)
+	#undef __CAPTURE_GET_PULSE
+	// no need to change the configuration
+	if(g_u8Counter % 2)	g_u16Temp = ICR1;
+	else{
+		if(ICR1 > g_u16Temp){
+			if(g_u8ovNum){
+				g_u16CapValue = g_u8ovNum * 65536 - (g_u16Temp - ICR1);
+	 			g_u8ovNum = 0;
+	 		}else{
+	 			g_u16CapValue = ICR1 - g_u16Temp;
+	 			g_u8Counter = 0;
+	 			g_u8ovNum = 0;
+	 		}
+	 	}
+	 	else if(ICR1 < g_u16Temp){
+	 		// check for an overflow
+	 		if(g_u8ovNum){
+	 			g_u16CapValue = g_u8ovNum * 65536 - (g_u16Temp - ICR1);
+	 			g_u8ovNum = 0;
+	 		}else{
+	 			// else there must be something wrong ignore this measurement
+	 			g_u16CapValue = 0;
+	 			g_u8ovNum = 0;
+	 		}
+	 	}
+	}
+	#elif defined(__CAPTURE_GET_PULSE)
+	if(g_u8Counter % 2)	g_u16Temp = ICR1;
+	else{
+		if(ICR1 > g_u16Temp){
+			if(g_u8ovNum){
+				g_u16CapValue = g_u8ovNum * 65536 - (g_u16Temp - ICR1);
+	 			g_u8ovNum = 0;
+	 		}else{
+		 		g_u16CapValue = ICR1 - g_u16Temp;
+		 		g_u8Counter = 0;
+		 		g_u8ovNum = 0;
+		 	}
+	 	}
+	 	else if(ICR1 < g_u16Temp){
+	 		// check for an overflow
+	 		if(g_u8ovNum){
+	 			g_u16CapValue = g_u8ovNum * 65536 - (g_u16Temp - ICR1);
+	 			g_u8ovNum = 0;
+	 		}else{
+	 			// else there must be something wrong ignore this measurement
+	 			g_u16CapValue = 0;
+	 			g_u8ovNum = 0;
+	 		}
+	}
+	// we need to change the timer edge configuration
+	TCCR1B ^= (1<<6);
+	#endif
+}
+
+ISR(TIMER1_OVF_vect)
+{
+	g_u8ovNum++;
+}
+#endif

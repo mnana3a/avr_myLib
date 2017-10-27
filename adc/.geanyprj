@@ -1,0 +1,7 @@
+[project]
+name=prj
+description=
+base_path=/home/mnana3a/Documents/AVR/Lib/
+run_cmd=
+regenerate=true
+type=All

@@ -1,0 +1,30 @@
+for(counter = 0 ; counter < 8 ; )
+	{
+		if(counter < 4)
+		{
+			if(!(_key & 0x01))
+			{
+				row = counter;
+				counter = 4;
+				_key >>= (counter - row);
+			}
+			else
+			{
+				_key >>= 1;
+				counter++;
+			}
+		}
+		else if(counter >= 4)
+		{
+			if(!(_key & 0x01))
+			{
+				col = counter - 4;
+				break;
+			}
+			else
+			{
+				_key >>= 1;
+				counter++;
+			}
+		}
+	}

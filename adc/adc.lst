@@ -1,0 +1,680 @@
+   1               		.file	"adc.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               	.global	adc_init
+  12               	adc_init:
+  13               	.LFB6:
+  14               		.file 1 "adc/adc.c"
+   1:adc/adc.c     **** #include "adc.h"
+   2:adc/adc.c     **** 
+   3:adc/adc.c     **** volatile uint16_t adcval;
+   4:adc/adc.c     **** volatile float adcValue;
+   5:adc/adc.c     **** uint8_t gmode;
+   6:adc/adc.c     **** float volt;
+   7:adc/adc.c     **** 
+   8:adc/adc.c     **** // NOTE: THE "do nothing" in the default cases is for when we need to change the adc channel use
+   9:adc/adc.c     **** //       we have to call the init again with the new inpupt and just put zeros in the rest of the 
+  10:adc/adc.c     **** //			 parameters
+  11:adc/adc.c     **** 
+  12:adc/adc.c     **** // THIS FUNCTION DEALS ONLY WITH THE SINGLE ENDED ADC ONLY
+  13:adc/adc.c     **** void adc_init(uint8_t ainput, int8_t convSpeed, signed char refVolt, int8_t mode)
+  14:adc/adc.c     **** {
+  15               		.loc 1 14 0
+  16               		.cfi_startproc
+  17               	.LVL0:
+  18               	/* prologue: function */
+  19               	/* frame size = 0 */
+  20               	/* stack size = 0 */
+  21               	.L__stack_usage = 0
+  15:adc/adc.c     ****     // pin-0 is default selected
+  16:adc/adc.c     ****     // mode is either 8 bit or 10 bit
+  17:adc/adc.c     ****     // set the analog input channel
+  18:adc/adc.c     ****     #ifdef inte		// compile if interrupt is enabled for this module
+  19:adc/adc.c     ****     ADCSRA |= (1<<3);
+  22               		.loc 1 19 0
+  23 0000 339A      		sbi 0x6,3
+  20:adc/adc.c     ****     sei();
+  24               		.loc 1 20 0
+  25               	/* #APP */
+  26               	 ;  20 "adc/adc.c" 1
+  27 0002 7894      		sei
+  28               	 ;  0 "" 2
+  21:adc/adc.c     ****     #endif
+  22:adc/adc.c     ****     
+  23:adc/adc.c     ****     switch (ainput)
+  29               		.loc 1 23 0
+  30               	/* #NOAPP */
+  31 0004 90E0      		ldi r25,0
+  32 0006 8830      		cpi r24,8
+  33 0008 9105      		cpc r25,__zero_reg__
+  34 000a 00F4      		brsh .L2
+  35 000c FC01      		movw r30,r24
+  36 000e E050      		subi r30,lo8(-(gs(.L4)))
+  37 0010 F040      		sbci r31,hi8(-(gs(.L4)))
+  38 0012 0C94 0000 		jmp __tablejump2__
+  39               	.LVL1:
+  40               		.section	.progmem.gcc_sw_table,"a",@progbits
+  41               		.p2align	1
+  42               	.L4:
+  43 0000 0000      		.word gs(.L3)
+  44 0002 0000      		.word gs(.L5)
+  45 0004 0000      		.word gs(.L6)
+  46 0006 0000      		.word gs(.L7)
+  47 0008 0000      		.word gs(.L8)
+  48 000a 0000      		.word gs(.L9)
+  49 000c 0000      		.word gs(.L10)
+  50 000e 0000      		.word gs(.L11)
+  51               		.text
+  52               	.L3:
+  24:adc/adc.c     ****     {
+  25:adc/adc.c     ****         case 0:
+  26:adc/adc.c     ****         DDRA &= ~(1<<0);
+  53               		.loc 1 26 0
+  54 0016 D098      		cbi 0x1a,0
+  27:adc/adc.c     ****         ADMUX &= 0XE0;
+  55               		.loc 1 27 0
+  56 0018 87B1      		in r24,0x7
+  57 001a 807E      		andi r24,lo8(-32)
+  58 001c 00C0      		rjmp .L48
+  59               	.L5:
+  28:adc/adc.c     ****         break;
+  29:adc/adc.c     ****         case 1:
+  30:adc/adc.c     ****         DDRA &= ~(1<<1);
+  60               		.loc 1 30 0
+  61 001e D198      		cbi 0x1a,1
+  31:adc/adc.c     ****         ADMUX &= 0XE0;
+  62               		.loc 1 31 0
+  63 0020 87B1      		in r24,0x7
+  64 0022 807E      		andi r24,lo8(-32)
+  65 0024 87B9      		out 0x7,r24
+  32:adc/adc.c     ****         ADMUX |= (1<<0);
+  66               		.loc 1 32 0
+  67 0026 389A      		sbi 0x7,0
+  33:adc/adc.c     ****         break;
+  68               		.loc 1 33 0
+  69 0028 00C0      		rjmp .L2
+  70               	.L6:
+  34:adc/adc.c     ****         case 2:
+  35:adc/adc.c     ****         DDRA &= ~(1<<2);
+  71               		.loc 1 35 0
+  72 002a D298      		cbi 0x1a,2
+  36:adc/adc.c     ****         ADMUX &= 0XE0;
+  73               		.loc 1 36 0
+  74 002c 87B1      		in r24,0x7
+  75 002e 807E      		andi r24,lo8(-32)
+  76 0030 87B9      		out 0x7,r24
+  37:adc/adc.c     ****         ADMUX |= (1<<1);
+  77               		.loc 1 37 0
+  78 0032 399A      		sbi 0x7,1
+  38:adc/adc.c     ****         break;
+  79               		.loc 1 38 0
+  80 0034 00C0      		rjmp .L2
+  81               	.L7:
+  39:adc/adc.c     ****         case 3:
+  40:adc/adc.c     ****         DDRA &= ~(1<<3);
+  82               		.loc 1 40 0
+  83 0036 D398      		cbi 0x1a,3
+  41:adc/adc.c     ****         ADMUX &= 0XE0;
+  84               		.loc 1 41 0
+  85 0038 87B1      		in r24,0x7
+  86 003a 807E      		andi r24,lo8(-32)
+  87 003c 87B9      		out 0x7,r24
+  42:adc/adc.c     ****         ADMUX |= (1<<0) | (1<<1);
+  88               		.loc 1 42 0
+  89 003e 87B1      		in r24,0x7
+  90 0040 8360      		ori r24,lo8(3)
+  91 0042 00C0      		rjmp .L48
+  92               	.L8:
+  43:adc/adc.c     ****         break;
+  44:adc/adc.c     ****         case 4:
+  45:adc/adc.c     ****         DDRA &= ~(1<<4);
+  93               		.loc 1 45 0
+  94 0044 D498      		cbi 0x1a,4
+  46:adc/adc.c     ****         ADMUX &= 0XE0;
+  95               		.loc 1 46 0
+  96 0046 87B1      		in r24,0x7
+  97 0048 807E      		andi r24,lo8(-32)
+  98 004a 87B9      		out 0x7,r24
+  47:adc/adc.c     ****         ADMUX |= (1<<2);
+  99               		.loc 1 47 0
+ 100 004c 3A9A      		sbi 0x7,2
+  48:adc/adc.c     ****         break;
+ 101               		.loc 1 48 0
+ 102 004e 00C0      		rjmp .L2
+ 103               	.L9:
+  49:adc/adc.c     ****         case 5:
+  50:adc/adc.c     ****         DDRA &= ~(1<<5);
+ 104               		.loc 1 50 0
+ 105 0050 D598      		cbi 0x1a,5
+  51:adc/adc.c     ****         ADMUX &= 0XE0;
+ 106               		.loc 1 51 0
+ 107 0052 87B1      		in r24,0x7
+ 108 0054 807E      		andi r24,lo8(-32)
+ 109 0056 87B9      		out 0x7,r24
+  52:adc/adc.c     ****         ADMUX |= (1<<0) | (1<<2);
+ 110               		.loc 1 52 0
+ 111 0058 87B1      		in r24,0x7
+ 112 005a 8560      		ori r24,lo8(5)
+ 113 005c 00C0      		rjmp .L48
+ 114               	.L10:
+  53:adc/adc.c     ****         break;
+  54:adc/adc.c     ****         case 6:
+  55:adc/adc.c     ****         DDRA &= ~(1<<6);
+ 115               		.loc 1 55 0
+ 116 005e D698      		cbi 0x1a,6
+  56:adc/adc.c     ****         ADMUX &= 0XE0;
+ 117               		.loc 1 56 0
+ 118 0060 87B1      		in r24,0x7
+ 119 0062 807E      		andi r24,lo8(-32)
+ 120 0064 87B9      		out 0x7,r24
+  57:adc/adc.c     ****         ADMUX |= (1<<1) | (1<<2);
+ 121               		.loc 1 57 0
+ 122 0066 87B1      		in r24,0x7
+ 123 0068 8660      		ori r24,lo8(6)
+ 124 006a 00C0      		rjmp .L48
+ 125               	.L11:
+  58:adc/adc.c     ****         break;
+  59:adc/adc.c     ****         case 7:
+  60:adc/adc.c     ****         DDRA &= ~(1<<7);
+ 126               		.loc 1 60 0
+ 127 006c D798      		cbi 0x1a,7
+  61:adc/adc.c     ****         ADMUX &= 0XE0;
+ 128               		.loc 1 61 0
+ 129 006e 87B1      		in r24,0x7
+ 130 0070 807E      		andi r24,lo8(-32)
+ 131 0072 87B9      		out 0x7,r24
+  62:adc/adc.c     ****         ADMUX |= (1<<0) | (1<<1) | (1<<2);
+ 132               		.loc 1 62 0
+ 133 0074 87B1      		in r24,0x7
+ 134 0076 8760      		ori r24,lo8(7)
+ 135               	.L48:
+ 136 0078 87B9      		out 0x7,r24
+ 137               	.L2:
+  63:adc/adc.c     ****         break;
+  64:adc/adc.c     ****         default:
+  65:adc/adc.c     ****         // do nothing
+  66:adc/adc.c     ****         break;
+  67:adc/adc.c     ****     }
+  68:adc/adc.c     ****     // set the conversion speed
+  69:adc/adc.c     ****     switch (convSpeed)
+ 138               		.loc 1 69 0
+ 139 007a 6830      		cpi r22,lo8(8)
+ 140 007c 01F0      		breq .L13
+ 141 007e 04F4      		brge .L14
+ 142 0080 6230      		cpi r22,lo8(2)
+ 143 0082 01F0      		breq .L15
+ 144 0084 6430      		cpi r22,lo8(4)
+ 145 0086 01F0      		breq .L16
+ 146 0088 6F3F      		cpi r22,lo8(-1)
+ 147 008a 01F4      		brne .L12
+  70:adc/adc.c     ****     {
+  71:adc/adc.c     ****         case -1:
+  72:adc/adc.c     ****             ADCSRA |= (1<<0)|(1<<1)|(1<<2);
+ 148               		.loc 1 72 0
+ 149 008c 86B1      		in r24,0x6
+ 150 008e 8760      		ori r24,lo8(7)
+ 151 0090 00C0      		rjmp .L49
+ 152               	.L14:
+  69:adc/adc.c     ****     {
+ 153               		.loc 1 69 0
+ 154 0092 6032      		cpi r22,lo8(32)
+ 155 0094 01F0      		breq .L18
+ 156 0096 6034      		cpi r22,lo8(64)
+ 157 0098 01F0      		breq .L19
+ 158 009a 6031      		cpi r22,lo8(16)
+ 159 009c 01F4      		brne .L12
+  73:adc/adc.c     ****             break;
+  74:adc/adc.c     ****         case 2:
+  75:adc/adc.c     ****             ADCSRA |= (1<<0);
+  76:adc/adc.c     ****             break;
+  77:adc/adc.c     ****         case 4:
+  78:adc/adc.c     ****             ADCSRA |= (1<<1);
+  79:adc/adc.c     ****             break;
+  80:adc/adc.c     ****         case 8:
+  81:adc/adc.c     ****             ADCSRA |= (1<<0)|(1<<1);
+  82:adc/adc.c     ****             break;
+  83:adc/adc.c     ****         case 16:
+  84:adc/adc.c     ****             ADCSRA |= (1<<2);
+ 160               		.loc 1 84 0
+ 161 009e 329A      		sbi 0x6,2
+  85:adc/adc.c     ****             break;
+ 162               		.loc 1 85 0
+ 163 00a0 00C0      		rjmp .L12
+ 164               	.L15:
+  75:adc/adc.c     ****             break;
+ 165               		.loc 1 75 0
+ 166 00a2 309A      		sbi 0x6,0
+  76:adc/adc.c     ****         case 4:
+ 167               		.loc 1 76 0
+ 168 00a4 00C0      		rjmp .L12
+ 169               	.L16:
+  78:adc/adc.c     ****             break;
+ 170               		.loc 1 78 0
+ 171 00a6 319A      		sbi 0x6,1
+  79:adc/adc.c     ****         case 8:
+ 172               		.loc 1 79 0
+ 173 00a8 00C0      		rjmp .L12
+ 174               	.L13:
+  81:adc/adc.c     ****             break;
+ 175               		.loc 1 81 0
+ 176 00aa 86B1      		in r24,0x6
+ 177 00ac 8360      		ori r24,lo8(3)
+ 178 00ae 00C0      		rjmp .L49
+ 179               	.L18:
+  86:adc/adc.c     ****         case 32:
+  87:adc/adc.c     ****             ADCSRA |= (1<<0)|(1<<2);
+ 180               		.loc 1 87 0
+ 181 00b0 86B1      		in r24,0x6
+ 182 00b2 8560      		ori r24,lo8(5)
+ 183 00b4 00C0      		rjmp .L49
+ 184               	.L19:
+  88:adc/adc.c     ****             break;
+  89:adc/adc.c     ****         case 64:
+  90:adc/adc.c     ****             ADCSRA |= (1<<1)|(1<<2);
+ 185               		.loc 1 90 0
+ 186 00b6 86B1      		in r24,0x6
+ 187 00b8 8660      		ori r24,lo8(6)
+ 188               	.L49:
+ 189 00ba 86B9      		out 0x6,r24
+ 190               	.L12:
+  91:adc/adc.c     ****             break;
+  92:adc/adc.c     ****         case 128:
+  93:adc/adc.c     ****             ADCSRA |= (1<<0)|(1<<1)|(1<<2);
+  94:adc/adc.c     ****             break;
+  95:adc/adc.c     ****         default:
+  96:adc/adc.c     ****             //ADCSRA |= (1<<0)|(1<<1)|(1<<2);
+  97:adc/adc.c     ****             // do nothing
+  98:adc/adc.c     ****             break;
+  99:adc/adc.c     ****     }
+ 100:adc/adc.c     ****     switch (refVolt)
+ 191               		.loc 1 100 0
+ 192 00bc 4635      		cpi r20,lo8(86)
+ 193 00be 01F0      		breq .L22
+ 194 00c0 04F4      		brge .L23
+ 195 00c2 4534      		cpi r20,lo8(69)
+ 196 00c4 01F0      		breq .L24
+ 197 00c6 4934      		cpi r20,lo8(73)
+ 198 00c8 01F0      		breq .L25
+ 199 00ca 4F3F      		cpi r20,lo8(-1)
+ 200 00cc 01F0      		breq .L24
+ 201 00ce 00C0      		rjmp .L21
+ 202               	.L23:
+ 203 00d0 4936      		cpi r20,lo8(105)
+ 204 00d2 01F0      		breq .L25
+ 205 00d4 4637      		cpi r20,lo8(118)
+ 206 00d6 01F0      		breq .L22
+ 207 00d8 4536      		cpi r20,lo8(101)
+ 208 00da 01F4      		brne .L21
+ 209 00dc 00C0      		rjmp .L24
+ 210               	.L25:
+ 101:adc/adc.c     ****     {
+ 102:adc/adc.c     ****         case -1:           // default if none is chosen
+ 103:adc/adc.c     ****             ADMUX &= ~(1<<7);
+ 104:adc/adc.c     ****             ADMUX &= ~(1<<6);
+ 105:adc/adc.c     ****             volt = 5.0;
+ 106:adc/adc.c     ****             break;
+ 107:adc/adc.c     ****         case 'i':		// internal
+ 108:adc/adc.c     ****         case 'I':
+ 109:adc/adc.c     ****             ADMUX |= (1<<6) | (1<<7);
+ 211               		.loc 1 109 0
+ 212 00de 87B1      		in r24,0x7
+ 213 00e0 806C      		ori r24,lo8(-64)
+ 214 00e2 87B9      		out 0x7,r24
+ 110:adc/adc.c     ****             volt = 2.56;
+ 215               		.loc 1 110 0
+ 216 00e4 8AE0      		ldi r24,lo8(10)
+ 217 00e6 97ED      		ldi r25,lo8(-41)
+ 218 00e8 A3E2      		ldi r26,lo8(35)
+ 219 00ea B0E4      		ldi r27,lo8(64)
+ 220 00ec 00C0      		rjmp .L51
+ 221               	.L22:
+ 111:adc/adc.c     ****             break;
+ 112:adc/adc.c     ****         case 'v':		// connected to Avcc = Vcc
+ 113:adc/adc.c     ****         case 'V':
+ 114:adc/adc.c     ****             ADMUX |= (1<<6);
+ 222               		.loc 1 114 0
+ 223 00ee 3E9A      		sbi 0x7,6
+ 115:adc/adc.c     ****             ADMUX &= ~(1<<7);
+ 224               		.loc 1 115 0
+ 225 00f0 3F98      		cbi 0x7,7
+ 226 00f2 00C0      		rjmp .L50
+ 227               	.L24:
+ 116:adc/adc.c     ****             volt = 5.0;
+ 117:adc/adc.c     ****             break;
+ 118:adc/adc.c     ****         case 'e':		// connected to external source can be any volatge value
+ 119:adc/adc.c     ****         case 'E':
+ 120:adc/adc.c     ****             ADMUX &= ~(1<<7);
+ 228               		.loc 1 120 0
+ 229 00f4 3F98      		cbi 0x7,7
+ 121:adc/adc.c     ****             ADMUX &= ~(1<<6);
+ 230               		.loc 1 121 0
+ 231 00f6 3E98      		cbi 0x7,6
+ 232               	.L50:
+ 122:adc/adc.c     ****             volt = 5.0;
+ 233               		.loc 1 122 0
+ 234 00f8 80E0      		ldi r24,0
+ 235 00fa 90E0      		ldi r25,0
+ 236 00fc A0EA      		ldi r26,lo8(-96)
+ 237 00fe B0E4      		ldi r27,lo8(64)
+ 238               	.L51:
+ 239 0100 8093 0000 		sts volt,r24
+ 240 0104 9093 0000 		sts volt+1,r25
+ 241 0108 A093 0000 		sts volt+2,r26
+ 242 010c B093 0000 		sts volt+3,r27
+ 243               	.L21:
+ 123:adc/adc.c     ****             break;
+ 124:adc/adc.c     ****         default:
+ 125:adc/adc.c     ****             // do nothing
+ 126:adc/adc.c     ****             break;
+ 127:adc/adc.c     ****     }
+ 128:adc/adc.c     ****     if (mode == -1)
+ 244               		.loc 1 128 0
+ 245 0110 2F3F      		cpi r18,lo8(-1)
+ 246 0112 01F4      		brne .L27
+ 129:adc/adc.c     ****     {
+ 130:adc/adc.c     ****         ADMUX |= (1<<5);	// HERE READ ONLY THE HIGH BYTE OF THE ADC
+ 247               		.loc 1 130 0
+ 248 0114 3D9A      		sbi 0x7,5
+ 131:adc/adc.c     ****         gmode = 8;		// set the mode global variable
+ 249               		.loc 1 131 0
+ 250 0116 88E0      		ldi r24,lo8(8)
+ 251 0118 8093 0000 		sts gmode,r24
+ 252 011c 00C0      		rjmp .L28
+ 253               	.L27:
+ 132:adc/adc.c     ****     }
+ 133:adc/adc.c     ****     else if(mode == 8)
+ 254               		.loc 1 133 0
+ 255 011e 2830      		cpi r18,lo8(8)
+ 256 0120 01F4      		brne .L29
+ 134:adc/adc.c     ****     {
+ 135:adc/adc.c     ****         ADMUX |= (1<<5);	// HERE READ ONLY THE HIGH BYTE OF THE ADC
+ 257               		.loc 1 135 0
+ 258 0122 3D9A      		sbi 0x7,5
+ 259 0124 00C0      		rjmp .L52
+ 260               	.L29:
+ 136:adc/adc.c     ****         gmode = 8;
+ 137:adc/adc.c     ****     }
+ 138:adc/adc.c     ****     else if(mode == 10)
+ 261               		.loc 1 138 0
+ 262 0126 2A30      		cpi r18,lo8(10)
+ 263 0128 01F4      		brne .L28
+ 139:adc/adc.c     ****     {
+ 140:adc/adc.c     ****         ADMUX &= ~(1<<5);	// HERE READ THE LOW BYTE FIRST THEN THE HIGH BYTE
+ 264               		.loc 1 140 0
+ 265 012a 3D98      		cbi 0x7,5
+ 266               	.L52:
+ 141:adc/adc.c     ****         gmode = 10;
+ 267               		.loc 1 141 0
+ 268 012c 2093 0000 		sts gmode,r18
+ 269               	.L28:
+ 142:adc/adc.c     ****     }
+ 143:adc/adc.c     ****     
+ 144:adc/adc.c     ****     // enable the adc module
+ 145:adc/adc.c     ****     ADCSRA |= (1<<ADEN);
+ 270               		.loc 1 145 0
+ 271 0130 379A      		sbi 0x6,7
+ 146:adc/adc.c     ****     ADCSRA |= (1<<ADSC);
+ 272               		.loc 1 146 0
+ 273 0132 369A      		sbi 0x6,6
+ 274 0134 0895      		ret
+ 275               		.cfi_endproc
+ 276               	.LFE6:
+ 278               	.global	__floatunsisf
+ 279               	.global	__vector_14
+ 281               	__vector_14:
+ 282               	.LFB7:
+ 147:adc/adc.c     **** }	//END ADC_INIT FUNCTION	
+ 148:adc/adc.c     **** 
+ 149:adc/adc.c     **** 
+ 150:adc/adc.c     **** #ifndef inte
+ 151:adc/adc.c     **** // upon calling this function it reads in only one sample and saves it in global variable (adcval)
+ 152:adc/adc.c     **** uint16_t adc_read(void)
+ 153:adc/adc.c     **** {
+ 154:adc/adc.c     **** 	if(gmode == 10){
+ 155:adc/adc.c     **** 		ADCSRA |= (1<<6);
+ 156:adc/adc.c     **** 		while((ADCSRA & (1<<ADIF)) == 0);
+ 157:adc/adc.c     **** 		ADCSRA |= (1<<ADIF);
+ 158:adc/adc.c     **** 		adcval = ADCL;
+ 159:adc/adc.c     **** 		adcval = adcval | (ADCH << 8);
+ 160:adc/adc.c     **** 		//adcval = adcval * (volt / 1023);		// it returns values in voltage which is a problem when the v
+ 161:adc/adc.c     **** 	}
+ 162:adc/adc.c     **** 	else if(gmode == 8){
+ 163:adc/adc.c     **** 		ADCSRA |= (1<<6);
+ 164:adc/adc.c     **** 		while((ADCSRA & (1<<ADIF)) == 0);
+ 165:adc/adc.c     **** 		ADCSRA |= (1<<ADIF);
+ 166:adc/adc.c     **** 		adcval = ADCH;
+ 167:adc/adc.c     **** 		//adcval = adcval * volt / 1023U;
+ 168:adc/adc.c     **** 	}
+ 169:adc/adc.c     **** 	adcValue = adcval;
+ 170:adc/adc.c     **** 	return adcValue;
+ 171:adc/adc.c     **** }
+ 172:adc/adc.c     **** #endif
+ 173:adc/adc.c     **** 
+ 174:adc/adc.c     **** #ifdef inte
+ 175:adc/adc.c     **** // using interrupt to handle adc reading
+ 176:adc/adc.c     **** ISR(ADC_vect)
+ 177:adc/adc.c     **** {
+ 283               		.loc 1 177 0
+ 284               		.cfi_startproc
+ 285 0136 1F92      		push r1
+ 286               	.LCFI0:
+ 287               		.cfi_def_cfa_offset 3
+ 288               		.cfi_offset 1, -2
+ 289 0138 0F92      		push r0
+ 290               	.LCFI1:
+ 291               		.cfi_def_cfa_offset 4
+ 292               		.cfi_offset 0, -3
+ 293 013a 0FB6      		in r0,__SREG__
+ 294 013c 0F92      		push r0
+ 295 013e 1124      		clr __zero_reg__
+ 296 0140 2F93      		push r18
+ 297               	.LCFI2:
+ 298               		.cfi_def_cfa_offset 5
+ 299               		.cfi_offset 18, -4
+ 300 0142 3F93      		push r19
+ 301               	.LCFI3:
+ 302               		.cfi_def_cfa_offset 6
+ 303               		.cfi_offset 19, -5
+ 304 0144 4F93      		push r20
+ 305               	.LCFI4:
+ 306               		.cfi_def_cfa_offset 7
+ 307               		.cfi_offset 20, -6
+ 308 0146 5F93      		push r21
+ 309               	.LCFI5:
+ 310               		.cfi_def_cfa_offset 8
+ 311               		.cfi_offset 21, -7
+ 312 0148 6F93      		push r22
+ 313               	.LCFI6:
+ 314               		.cfi_def_cfa_offset 9
+ 315               		.cfi_offset 22, -8
+ 316 014a 7F93      		push r23
+ 317               	.LCFI7:
+ 318               		.cfi_def_cfa_offset 10
+ 319               		.cfi_offset 23, -9
+ 320 014c 8F93      		push r24
+ 321               	.LCFI8:
+ 322               		.cfi_def_cfa_offset 11
+ 323               		.cfi_offset 24, -10
+ 324 014e 9F93      		push r25
+ 325               	.LCFI9:
+ 326               		.cfi_def_cfa_offset 12
+ 327               		.cfi_offset 25, -11
+ 328 0150 AF93      		push r26
+ 329               	.LCFI10:
+ 330               		.cfi_def_cfa_offset 13
+ 331               		.cfi_offset 26, -12
+ 332 0152 BF93      		push r27
+ 333               	.LCFI11:
+ 334               		.cfi_def_cfa_offset 14
+ 335               		.cfi_offset 27, -13
+ 336 0154 EF93      		push r30
+ 337               	.LCFI12:
+ 338               		.cfi_def_cfa_offset 15
+ 339               		.cfi_offset 30, -14
+ 340 0156 FF93      		push r31
+ 341               	.LCFI13:
+ 342               		.cfi_def_cfa_offset 16
+ 343               		.cfi_offset 31, -15
+ 344               	/* prologue: Signal */
+ 345               	/* frame size = 0 */
+ 346               	/* stack size = 15 */
+ 347               	.L__stack_usage = 15
+ 178:adc/adc.c     **** 	if(gmode == 10){
+ 348               		.loc 1 178 0
+ 349 0158 8091 0000 		lds r24,gmode
+ 350 015c 8A30      		cpi r24,lo8(10)
+ 351 015e 01F4      		brne .L55
+ 179:adc/adc.c     ****         ADCSRA |= (1<<6);
+ 352               		.loc 1 179 0
+ 353 0160 369A      		sbi 0x6,6
+ 180:adc/adc.c     **** 		adcval = ADCL;
+ 354               		.loc 1 180 0
+ 355 0162 84B1      		in r24,0x4
+ 356 0164 90E0      		ldi r25,0
+ 357 0166 9093 0000 		sts adcval+1,r25
+ 358 016a 8093 0000 		sts adcval,r24
+ 181:adc/adc.c     **** 		adcval = adcval | (ADCH << 8);
+ 359               		.loc 1 181 0
+ 360 016e 8091 0000 		lds r24,adcval
+ 361 0172 9091 0000 		lds r25,adcval+1
+ 362 0176 25B1      		in r18,0x5
+ 363 0178 922B      		or r25,r18
+ 364 017a 00C0      		rjmp .L57
+ 365               	.L55:
+ 182:adc/adc.c     **** 		adcValue = adcval;
+ 183:adc/adc.c     **** 		//adcval = adcval * volt / 1023U;
+ 184:adc/adc.c     **** 	}
+ 185:adc/adc.c     **** 	else if(gmode == 8){
+ 366               		.loc 1 185 0
+ 367 017c 8830      		cpi r24,lo8(8)
+ 368 017e 01F4      		brne .L56
+ 186:adc/adc.c     **** 		adcval = ADCH;
+ 369               		.loc 1 186 0
+ 370 0180 85B1      		in r24,0x5
+ 371 0182 90E0      		ldi r25,0
+ 372               	.L57:
+ 373 0184 9093 0000 		sts adcval+1,r25
+ 374 0188 8093 0000 		sts adcval,r24
+ 187:adc/adc.c     **** 		adcValue = adcval;
+ 375               		.loc 1 187 0
+ 376 018c 6091 0000 		lds r22,adcval
+ 377 0190 7091 0000 		lds r23,adcval+1
+ 378 0194 80E0      		ldi r24,0
+ 379 0196 90E0      		ldi r25,0
+ 380 0198 0E94 0000 		call __floatunsisf
+ 381               	.LVL2:
+ 382 019c 6093 0000 		sts adcValue,r22
+ 383 01a0 7093 0000 		sts adcValue+1,r23
+ 384 01a4 8093 0000 		sts adcValue+2,r24
+ 385 01a8 9093 0000 		sts adcValue+3,r25
+ 386               	.L56:
+ 188:adc/adc.c     **** 		//adcval = adcval * volt / 1023U;
+ 189:adc/adc.c     **** 	}
+ 190:adc/adc.c     **** 	ADCSRA |= (1<<6);		// START CONVERSION AGAIN
+ 387               		.loc 1 190 0
+ 388 01ac 369A      		sbi 0x6,6
+ 389               	/* epilogue start */
+ 191:adc/adc.c     **** }
+ 390               		.loc 1 191 0
+ 391 01ae FF91      		pop r31
+ 392 01b0 EF91      		pop r30
+ 393 01b2 BF91      		pop r27
+ 394 01b4 AF91      		pop r26
+ 395 01b6 9F91      		pop r25
+ 396 01b8 8F91      		pop r24
+ 397 01ba 7F91      		pop r23
+ 398 01bc 6F91      		pop r22
+ 399 01be 5F91      		pop r21
+ 400 01c0 4F91      		pop r20
+ 401 01c2 3F91      		pop r19
+ 402 01c4 2F91      		pop r18
+ 403 01c6 0F90      		pop r0
+ 404 01c8 0FBE      		out __SREG__,r0
+ 405 01ca 0F90      		pop r0
+ 406 01cc 1F90      		pop r1
+ 407 01ce 1895      		reti
+ 408               		.cfi_endproc
+ 409               	.LFE7:
+ 411               	.global	__fixunssfsi
+ 412               	.global	adc_read
+ 414               	adc_read:
+ 415               	.LFB8:
+ 192:adc/adc.c     **** 
+ 193:adc/adc.c     **** uint16_t adc_read(void)
+ 194:adc/adc.c     **** {
+ 416               		.loc 1 194 0
+ 417               		.cfi_startproc
+ 418               	/* prologue: function */
+ 419               	/* frame size = 0 */
+ 420               	/* stack size = 0 */
+ 421               	.L__stack_usage = 0
+ 195:adc/adc.c     ****     return adcValue;
+ 422               		.loc 1 195 0
+ 423 01d0 6091 0000 		lds r22,adcValue
+ 424 01d4 7091 0000 		lds r23,adcValue+1
+ 425 01d8 8091 0000 		lds r24,adcValue+2
+ 426 01dc 9091 0000 		lds r25,adcValue+3
+ 427 01e0 0E94 0000 		call __fixunssfsi
+ 428               	.LVL3:
+ 196:adc/adc.c     **** }
+ 429               		.loc 1 196 0
+ 430 01e4 CB01      		movw r24,r22
+ 431 01e6 0895      		ret
+ 432               		.cfi_endproc
+ 433               	.LFE8:
+ 435               	.global	adc_stop
+ 437               	adc_stop:
+ 438               	.LFB9:
+ 197:adc/adc.c     **** 
+ 198:adc/adc.c     **** #endif
+ 199:adc/adc.c     **** 
+ 200:adc/adc.c     **** void adc_stop(void)
+ 201:adc/adc.c     **** {
+ 439               		.loc 1 201 0
+ 440               		.cfi_startproc
+ 441               	/* prologue: function */
+ 442               	/* frame size = 0 */
+ 443               	/* stack size = 0 */
+ 444               	.L__stack_usage = 0
+ 202:adc/adc.c     ****     ADCSRA &= ~(1<<ADIE);
+ 445               		.loc 1 202 0
+ 446 01e8 3398      		cbi 0x6,3
+ 203:adc/adc.c     ****     ADCSRA &= ~(1<<ADEN);
+ 447               		.loc 1 203 0
+ 448 01ea 3798      		cbi 0x6,7
+ 449 01ec 0895      		ret
+ 450               		.cfi_endproc
+ 451               	.LFE9:
+ 453               		.comm	volt,4,1
+ 454               		.comm	gmode,1,1
+ 455               		.comm	adcValue,4,1
+ 456               		.comm	adcval,2,1
+ 457               	.Letext0:
+ 458               		.file 2 "/usr/lib/avr/include/stdint.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 adc.c
+     /tmp/cc58ibVK.s:2      *ABS*:000000000000003e __SP_H__
+     /tmp/cc58ibVK.s:3      *ABS*:000000000000003d __SP_L__
+     /tmp/cc58ibVK.s:4      *ABS*:000000000000003f __SREG__
+     /tmp/cc58ibVK.s:5      *ABS*:0000000000000000 __tmp_reg__
+     /tmp/cc58ibVK.s:6      *ABS*:0000000000000001 __zero_reg__
+     /tmp/cc58ibVK.s:12     .text:0000000000000000 adc_init
+                            *COM*:0000000000000004 volt
+                            *COM*:0000000000000001 gmode
+     /tmp/cc58ibVK.s:281    .text:0000000000000136 __vector_14
+                            *COM*:0000000000000002 adcval
+                            *COM*:0000000000000004 adcValue
+     /tmp/cc58ibVK.s:414    .text:00000000000001d0 adc_read
+     /tmp/cc58ibVK.s:437    .text:00000000000001e8 adc_stop
+
+UNDEFINED SYMBOLS
+__tablejump2__
+__floatunsisf
+__fixunssfsi
+__do_clear_bss
