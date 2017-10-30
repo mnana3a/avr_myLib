@@ -17,7 +17,7 @@
 //                  this mode can be used for applications that depend mainly on capturing and measure singalns for the most part
 
 // NOTE: using _delay_ms messes up with the functionality of the code and the input capture
-
+// FIXME: with low freq the result is wrong
 // NOTE: This lib changes timer1 prescaler, so make sure if timer 1 is used elsewhere that the prescaler isnt messed up
 // FIXME: add a way to protect the prescaler between libs
 

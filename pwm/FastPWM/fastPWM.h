@@ -15,6 +15,10 @@
 *                       : added a part in dutyPWM to reenable pwm mode after it is been disabled by stopPWM
 */
 
+// USER: WHEN USING A TIMER IN A PWM MODE DONT USE IT IN ANOTHER MODE ALONG SIDE PWM MODE cause wave gen mode changes the timer sequence
+
+// USER: dont operate both 1A and 1B at the same time, only operate them together if they operate on the same freq
+
 #ifndef __FAST_PWM__
 #define __FAST_PWM__
 
@@ -27,22 +31,39 @@
 extern uint8_t fastPWM;
 
 //#define __PWM_USE_OCR1A
-//#define __PWM_USE_ICR1
+#define __PWM_USE_ICR1
 
 #ifndef F_CPU
     #define F_CPU 16000000UL
 #endif
-#define PWM0 3
-#define PWM1A 5
-#define PWM1B 4
-#define PWM2 7
+
+#if defined(__AVR_ATmega32__) || defined(__AVR_ATmega16__)
+    #define PWM0DDR DDRB
+    #define PWM1DDR DDRD
+    #define PWM2DDR DDRD
+    #define PWM0PIN   3
+    #define PWM1APIN 5
+    #define PWM1BPIN 4
+    #define PWM2PIN 7
+#elif defined(__AVR_ATmega128__)
+    #define PWM0DDR DDRB
+    #define PWM1DDR DDRB
+    #define PWM2DDR DDRB
+    #define PWM3DDR DDRE
+    #define PWM0PIN   4
+    #define PWM1APIN 5
+    #define PWM1BPIN 6
+    #define PWM1CPIN 7
+    #define PWM2PIN 7
+    #define PWM3APIN 3
+    #define PWM3BPIN 4
+    #define PWM3CPIN 5
+#endif
 
 void fastPWM0_init(uint32_t freq);
 void fastPWM0_duty(uint8_t duty);
 void fastPWM0_stop(void);
 
-// dont operate both 1A and 1B at the same time
-// only operate them together if they operate on the same freq
 void fastPWM1A_init(uint32_t freq);
 void fastPWM1A_duty(float duty);
 void fastPWM1A_stop(void);

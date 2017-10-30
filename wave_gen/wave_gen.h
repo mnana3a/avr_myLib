@@ -1,4 +1,4 @@
-// TODO: add supp for the atmega128 more pins for the wave gen mode
+// TODO: check if float freq required for time1/timer3
 
 // NOTE: dont operate oc1c with oc1a or oc1b
 // NOTE: dont operate oc1c with oc2 as they share the same pin
