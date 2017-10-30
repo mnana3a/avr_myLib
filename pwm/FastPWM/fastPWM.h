@@ -1,8 +1,9 @@
 // timer 1 uses mode 14 which uses ICR1 for top value..
 // cant use ICR1 for something else while using this lib.
-// FIXME: add a support for mode 15 which uses OCR1A for top value.
+
+//FIXME : add a support for mode 15 which uses OCR1A for top value.
 //          but doing so will make OC1A not an option while in that mode.
-// FIXME: to add support for mode 15 follow the steps done in wave_gen.c
+//FIXME : to add support for mode 15 follow the steps done in wave_gen.c
 //                  #if defined(__WAVE_USE_OCR1A)
 //                  OCR1A = 65535;
 //                  #elif defined(__WAVE_USE_ICR1)
@@ -10,32 +11,45 @@
 //                  #endif
 // + change the mode in registers + top value register
 
-// LOG:
+//LOG :
 /* 30-7-2017 : added a part in stopPWM TCCRn Register to make it normal port when stopping it
 *                       : added a part in dutyPWM to reenable pwm mode after it is been disabled by stopPWM
 */
 
-// USER: WHEN USING A TIMER IN A PWM MODE DONT USE IT IN ANOTHER MODE ALONG SIDE PWM MODE cause wave gen mode changes the timer sequence
+//USER : WHEN USING A TIMER IN A PWM MODE DONT USE IT IN ANOTHER MODE ALONG SIDE PWM MODE cause wave gen mode changes the timer sequence
 
-// USER: dont operate both 1A and 1B at the same time, only operate them together if they operate on the same freq
+//USER : dont operate both 1A and 1B at the same time, only operate them together if they operate on the same freq
 
 #ifndef __FAST_PWM__
 #define __FAST_PWM__
+
+#ifndef F_CPU
+    #define F_CPU 16000000UL
+#endif
 
 #include <inttypes.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-// NOTE: added for geany proj plug-in to catch the def and go to the file by pressing on
+//NOTE : added for geany proj plug-in to catch the def and go to the file by pressing on
 // fastPWM.h
 extern uint8_t fastPWM;
 
-//#define __PWM_USE_OCR1A
 #define __PWM_USE_ICR1
 
-#ifndef F_CPU
-    #define F_CPU 16000000UL
+#ifdef __CAP_USE_ICR1
+    #define __PWM_USE_OCR1A
+    #undef __PWM_USE_ICR1
 #endif
+
+#if defined(__AVR_ATmega128__)
+    #define __PWM_USE_ICR3
+    #ifdef __CAP_USE_ICR3
+        #define __PWM_USE_OCR3A
+        #undef __PWM_USE_ICR3
+    #endif
+#endif
+
 
 #if defined(__AVR_ATmega32__) || defined(__AVR_ATmega16__)
     #define PWM0DDR DDRB

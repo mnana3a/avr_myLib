@@ -1,5 +1,5 @@
-// NOTE: this driver has a flaw when the calculated prescaler with/without truncation is one of the acutal prescalers values
-// NOTE: hard-coded numbers are left here to make the process afap
+//NOTE : this driver has a flaw when the calculated prescaler with/without truncation is one of the acutal prescalers values
+//NOTE : hard-coded numbers are left here to make the process afap
 #include "wave_gen.h"
 
 static uint8_t g_u8Timer1_flag = 0;
@@ -17,34 +17,39 @@ void waveGenerator0_set(uint32_t freq)
 
     // wave freq = FOSC / 2*(OCR0 + 1) * prescaler
     // least possible prescaler is better
-    if (freq < 122ul){
-        prescaler = 1024;
-        #if defined(__AVR_ATmega16__) || defined(__AVR_ATmega32__)
-            pre = 5;
-        #elif defined(__AVR_ATmega128__)
-            pre = 7;
-        #endif
-    }
-    else
-    {
-        #if defined(__AVR_ATmega16__) || defined(__AVR_ATmega32__)
-            if(freq > 8000000ul){prescaler = 1; pre = 1;}
-            else if (freq <= 8000000ul && freq >= 31250ul){prescaler = 1; pre = 1;}
-            else if (freq <= 1000000ul && freq >= 3906ul){prescaler = 8; pre = 2;}
-            else if (freq <= 125000ul && freq >= 488ul){prescaler = 64; pre = 3;}
-            else if (freq <= 31250ul && freq >= 122ul){prescaler = 256; pre = 4;}
-            else if (freq <= 7812ul && freq >= 31ul){prescaler = 1024; pre = 5;}
-        #elif defined(__AVR_ATmega128__)
-            if(freq > 8000000ul){prescaler = 1; pre = 1;}
-            else if (freq <= 8000000ul && freq >= 31250ul){prescaler = 1; pre = 1;}
-            else if (freq <= 1000000ul && freq >= 3906ul){prescaler = 8; pre = 2;}
-            else if (freq <= 250000ul && freq >= 976ul){prescaler = 32; pre = 3;}
-            else if (freq <= 125000ul && freq >= 488ul){prescaler = 64; pre = 4;}
-            else if (freq <= 62500ul && freq >= 244ul){prescaler = 128; pre = 5;}
-            else if (freq <= 31250ul && freq >= 122ul){prescaler = 256; pre = 6;}
-            else if (freq <= 7812ul && freq >= 31ul){prescaler = 1024; pre = 7;}
-        #endif
-    }
+    #if defined(__AVR_ATmega16__) || defined(__AVR_ATmega32__)
+        if(freq >= (uint32_t)(F_CPU/2ul))
+            {prescaler = 1; pre = 1;}
+        else if (freq < (uint32_t)(F_CPU/2ul) && freq >= (uint32_t)(F_CPU/512ul))
+            {prescaler = 1; pre = 1;}
+        else if (freq <= (uint32_t)(F_CPU/16ul) && freq >= (uint32_t)(F_CPU/4096ul))
+            {prescaler = 8; pre = 2;}
+        else if (freq <= (uint32_t)(F_CPU/128ul) && freq >= (uint32_t)(F_CPU/32768ul))
+            {prescaler = 64; pre = 3;}
+        else if (freq <= (uint32_t)(F_CPU/512ul) && freq >= (uint32_t)(F_CPU/131072ul))
+            {prescaler = 256; pre = 4;}
+        else if (freq <= (uint32_t)(F_CPU/2048ul) && freq >= (uint32_t)(F_CPU/524288ul))
+            {prescaler = 1024; pre = 5;}
+            
+    #elif defined(__AVR_ATmega128__)
+        if(freq >= (uint32_t)(F_CPU/2ul))
+            {prescaler = 1; pre = 1;}
+        else if (freq < (uint32_t)(F_CPU/2ul) && freq >= (uint32_t)(F_CPU/512ul))
+            {prescaler = 1; pre = 1;}
+        else if (freq <= (uint32_t)(F_CPU/16ul) && freq >= (uint32_t)(F_CPU/4096ul))
+            {prescaler = 8; pre = 2;}
+        else if (freq <= (uint32_t)(F_CPU/64ul) && freq >= (uint32_t)(F_CPU/16384ul))
+            {prescaler = 32; pre = 3;}
+        else if (freq <= (uint32_t)(F_CPU/128ul) && freq >= (uint32_t)(F_CPU/32768ul))
+            {prescaler = 64; pre = 4;}
+        else if (freq <= (uint32_t)(F_CPU/256ul) && freq >= (uint32_t)(F_CPU/65536ul))
+            {prescaler = 128; pre = 5;}
+        else if (freq <= (uint32_t)(F_CPU/512ul) && freq >= (uint32_t)(F_CPU/131072ul))
+            {prescaler = 256; pre = 6;}
+        else if (freq <= (uint32_t)(F_CPU/2048ul) && freq >= (uint32_t)(F_CPU/524288ul))
+            {prescaler = 1024; pre = 7;}
+    #endif
+
     OCR0 = (F_CPU / (2ul * prescaler * freq)) - 1ul;
     // set the prescaler in the register
     #if defined(__AVR_ATmega16__) || defined(__AVR_ATmega32__) || defined(__AVR_ATmega128__)
@@ -75,34 +80,40 @@ void waveGenerator2_set(uint32_t freq)
     // least possible prescaler is better
     if (!g_u8Timer2_flag)
     {
-        if (freq <= 122ul){
-            prescaler = 1024;
-            #if defined(__AVR_ATmega16__) || defined(__AVR_ATmega32__)
-                pre = 7;
-            #elif defined(__AVR_ATmega128__)
-                pre = 5;
-            #endif
-        }
-        else
-        {
-            #if defined(__AVR_ATmega16__) || defined(__AVR_ATmega32__)
-                if(freq > 8000000ul){prescaler = 1; pre = 1;}
-                else if (freq <= 8000000ul && freq >= 31250ul){prescaler = 1; pre = 1;}
-                else if (freq <= 1000000ul && freq >= 3906ul){prescaler = 8; pre = 2;}
-                else if (freq <= 250000ul && freq >= 976ul){prescaler = 32; pre = 3;}
-                else if (freq <= 125000ul && freq >= 488ul){prescaler = 64; pre = 4;}
-                else if (freq <= 62500ul && freq >= 244ul){prescaler = 128; pre = 5;}
-                else if (freq <= 31250ul && freq >= 122ul){prescaler = 256; pre = 6;}
-                else if (freq <= 7812ul && freq >= 31ul){prescaler = 1024; pre = 7;}
-            #elif defined(__AVR_ATmega128__)
-                if(freq > 8000000ul){prescaler = 1; pre = 1;}
-                else if (freq <= 8000000ul && freq >= 31250ul){prescaler = 1; pre = 1;}
-                else if (freq <= 1000000ul && freq >= 3906ul){prescaler = 8; pre = 2;}
-                else if (freq <= 125000ul && freq >= 488ul){prescaler = 64; pre = 3;}
-                else if (freq <= 31250ul && freq >= 122ul){prescaler = 256; pre = 4;}
-                else if (freq <= 7812ul && freq >= 31ul){prescaler = 1024; pre = 5;}
-            #endif
-        }
+        #if defined(__AVR_ATmega16__) || defined(__AVR_ATmega32__)
+            if(freq >= (uint32_t)(F_CPU/2ul))
+            {prescaler = 1; pre = 1;}
+        else if (freq < (uint32_t)(F_CPU/2ul) && freq >= (uint32_t)(F_CPU/512ul))
+            {prescaler = 1; pre = 1;}
+        else if (freq <= (uint32_t)(F_CPU/16ul) && freq >= (uint32_t)(F_CPU/4096ul))
+            {prescaler = 8; pre = 2;}
+        else if (freq <= (uint32_t)(F_CPU/64ul) && freq >= (uint32_t)(F_CPU/16384ul))
+            {prescaler = 32; pre = 3;}
+        else if (freq <= (uint32_t)(F_CPU/128ul) && freq >= (uint32_t)(F_CPU/32768ul))
+            {prescaler = 64; pre = 4;}
+        else if (freq <= (uint32_t)(F_CPU/256ul) && freq >= (uint32_t)(F_CPU/65536ul))
+            {prescaler = 128; pre = 5;}
+        else if (freq <= (uint32_t)(F_CPU/512ul) && freq >= (uint32_t)(F_CPU/131072ul))
+            {prescaler = 256; pre = 6;}
+        else if (freq <= (uint32_t)(F_CPU/2048ul) && freq >= (uint32_t)(F_CPU/524288ul))
+            {prescaler = 1024; pre = 7;}
+            
+        #elif defined(__AVR_ATmega128__)
+            if(freq >= (uint32_t)(F_CPU/2ul))
+            {prescaler = 1; pre = 1;}
+        else if (freq < (uint32_t)(F_CPU/2ul) && freq >= (uint32_t)(F_CPU/512ul))
+            {prescaler = 1; pre = 1;}
+        else if (freq <= (uint32_t)(F_CPU/16ul) && freq >= (uint32_t)(F_CPU/4096ul))
+            {prescaler = 8; pre = 2;}
+        else if (freq <= (uint32_t)(F_CPU/128ul) && freq >= (uint32_t)(F_CPU/32768ul))
+            {prescaler = 64; pre = 3;}
+        else if (freq <= (uint32_t)(F_CPU/512ul) && freq >= (uint32_t)(F_CPU/131072ul))
+            {prescaler = 256; pre = 4;}
+        else if (freq <= (uint32_t)(F_CPU/2048ul) && freq >= (uint32_t)(F_CPU/524288ul))
+            {prescaler = 1024; pre = 5;}
+            
+        #endif
+        
         OCR2 = (F_CPU / (2ul * prescaler * freq)) - 1ul;
         // set the prescaler in the register
         #if defined(__AVR_ATmega16__) || defined(__AVR_ATmega32__) || defined(__AVR_ATmega128__)
@@ -146,12 +157,18 @@ void waveGenerator1A_set(uint32_t freq)
     if (!g_u8Timer1_flag)
     {
         #if defined(__AVR_ATmega16__) || defined(__AVR_ATmega32__) || defined(__AVR_ATmega128__)
-            if(freq > 8000000ul){prescaler = 1; pre = 1;}
-            else if (freq <= 8000000ul && freq >= 123ul){prescaler = 1; pre = 1;}
-            else if (freq <= 1000000ul && freq >= 16ul){prescaler = 8; pre = 2;}
-            else if (freq <= 125000ul && freq >= 2ul){prescaler = 64; pre = 3;}
-            else if (freq <= 31250ul && freq >= 1ul){prescaler = 256; pre = 4;}
-            else if (freq < 1ul){prescaler = 1024; pre = 5;}
+            if(freq >= (uint32_t)(F_CPU/2ul))
+                {prescaler = 1; pre = 1;}
+            else if (freq < (uint32_t)(F_CPU/2ul) && freq >= (uint32_t)((F_CPU/131072ul)+1ul))
+                {prescaler = 1; pre = 1;}
+            else if (freq < (uint32_t)(F_CPU/16ul) && freq >= (uint32_t)((F_CPU/1048576ul)+1ul))
+                {prescaler = 8; pre = 2;}
+            else if (freq < (uint32_t)(F_CPU/128ul) && freq >= (uint32_t)((F_CPU/8388608ul)+1ul))
+                {prescaler = 64; pre = 3;}
+            else if (freq < (uint32_t)(F_CPU/512ul) && freq >= (uint32_t)1)
+                {prescaler = 256; pre = 4;}
+            else if (freq < 1ul)
+                {prescaler = 1024; pre = 5;}
         #endif
         
         #if defined(__WAVE_USE_OCR1A)
@@ -219,12 +236,18 @@ void waveGenerator1B_set(uint32_t freq)
     if (!g_u8Timer1_flag)
     {
         #if defined(__AVR_ATmega16__) || defined(__AVR_ATmega32__) || defined(__AVR_ATmega128__)
-            if(freq > 8000000ul){prescaler = 1; pre = 1;}
-            else if (freq <= 8000000ul && freq >= 123ul){prescaler = 1; pre = 1;}
-            else if (freq <= 1000000ul && freq >= 16ul){prescaler = 8; pre = 2;}
-            else if (freq <= 125000ul && freq >= 2ul){prescaler = 64; pre = 3;}
-            else if (freq <= 31250ul && freq >= 1ul){prescaler = 256; pre = 4;}
-            else if (freq < 1ul){prescaler = 1024; pre = 5;}
+            if(freq >= (uint32_t)(F_CPU/2ul))
+                {prescaler = 1; pre = 1;}
+            else if (freq < (uint32_t)(F_CPU/2ul) && freq >= (uint32_t)((F_CPU/131072ul)+1ul))
+                {prescaler = 1; pre = 1;}
+            else if (freq < (uint32_t)(F_CPU/16ul) && freq >= (uint32_t)((F_CPU/1048576ul)+1ul))
+                {prescaler = 8; pre = 2;}
+            else if (freq < (uint32_t)(F_CPU/128ul) && freq >= (uint32_t)((F_CPU/8388608ul)+1ul))
+                {prescaler = 64; pre = 3;}
+            else if (freq < (uint32_t)(F_CPU/512ul) && freq >= (uint32_t)1)
+                {prescaler = 256; pre = 4;}
+            else if (freq < 1ul)
+                {prescaler = 1024; pre = 5;}
         #endif
         
         #if defined(__WAVE_USE_OCR1A)
@@ -294,12 +317,18 @@ void waveGenerator1C_set(uint32_t freq)
     // mode 4 or 12 is used depending on the definition in the header file
     if (!g_u8Timer1_flag && !g_u8Timer2_flag)
     {
-        if(freq > 8000000ul){prescaler = 1; pre = 1;}
-        else if (freq <= 8000000ul && freq >= 123ul){prescaler = 1; pre = 1;}
-        else if (freq <= 1000000ul && freq >= 16ul){prescaler = 8; pre = 2;}
-        else if (freq <= 125000ul && freq >= 2ul){prescaler = 64; pre = 3;}
-        else if (freq <= 31250ul && freq >= 1ul){prescaler = 256; pre = 4;}
-        else if (freq < 1ul){prescaler = 1024; pre = 5;}
+        if(freq >= (uint32_t)(F_CPU/2ul))
+                {prescaler = 1; pre = 1;}
+        else if (freq < (uint32_t)(F_CPU/2ul) && freq >= (uint32_t)((F_CPU/131072ul)+1ul))
+            {prescaler = 1; pre = 1;}
+        else if (freq < (uint32_t)(F_CPU/16ul) && freq >= (uint32_t)((F_CPU/1048576ul)+1ul))
+            {prescaler = 8; pre = 2;}
+        else if (freq < (uint32_t)(F_CPU/128ul) && freq >= (uint32_t)((F_CPU/8388608ul)+1ul))
+            {prescaler = 64; pre = 3;}
+        else if (freq < (uint32_t)(F_CPU/512ul) && freq >= (uint32_t)1)
+            {prescaler = 256; pre = 4;}
+        else if (freq < 1ul)
+            {prescaler = 1024; pre = 5;}
         
         #if defined(__WAVE_USE_OCR1A)
             OCR1A = (F_CPU / (2ul * prescaler * freq)) - 1ul;
@@ -369,12 +398,18 @@ void waveGenerator3A_set(uint32_t freq)
     // mode 4 or 12 is used depending on the definition in the header file
     if (!g_u8Timer3_flag)
     {
-        if(freq > 8000000ul){prescaler = 1; pre = 1;}
-        else if (freq <= 8000000ul && freq >= 123ul){prescaler = 1; pre = 1;}
-        else if (freq <= 1000000ul && freq >= 16ul){prescaler = 8; pre = 2;}
-        else if (freq <= 125000ul && freq >= 2ul){prescaler = 64; pre = 3;}
-        else if (freq <= 31250ul && freq >= 1ul){prescaler = 256; pre = 4;}
-        else if (freq < 1ul){prescaler = 1024; pre = 5;}
+        if(freq >= (uint32_t)(F_CPU/2ul))
+                {prescaler = 1; pre = 1;}
+        else if (freq < (uint32_t)(F_CPU/2ul) && freq >= (uint32_t)((F_CPU/131072ul)+1ul))
+            {prescaler = 1; pre = 1;}
+        else if (freq < (uint32_t)(F_CPU/16ul) && freq >= (uint32_t)((F_CPU/1048576ul)+1ul))
+            {prescaler = 8; pre = 2;}
+        else if (freq < (uint32_t)(F_CPU/128ul) && freq >= (uint32_t)((F_CPU/8388608ul)+1ul))
+            {prescaler = 64; pre = 3;}
+        else if (freq < (uint32_t)(F_CPU/512ul) && freq >= (uint32_t)1)
+            {prescaler = 256; pre = 4;}
+        else if (freq < 1ul)
+            {prescaler = 1024; pre = 5;}
         
         #if defined(__WAVE_USE_OCR3A)
             OCR3A = (F_CPU / (2ul * prescaler * freq)) - 1ul;
@@ -437,12 +472,18 @@ void waveGenerator3B_set(uint32_t freq)
     // mode 4 or 12 is used depending on the definition in the header file
     if (!g_u8Timer3_flag)
     {
-        if(freq > 8000000ul){prescaler = 1; pre = 1;}
-        else if (freq <= 8000000ul && freq >= 123ul){prescaler = 1; pre = 1;}
-        else if (freq <= 1000000ul && freq >= 16ul){prescaler = 8; pre = 2;}
-        else if (freq <= 125000ul && freq >= 2ul){prescaler = 64; pre = 3;}
-        else if (freq <= 31250ul && freq >= 1ul){prescaler = 256; pre = 4;}
-        else if (freq < 1ul){prescaler = 1024; pre = 5;}
+        if(freq >= (uint32_t)(F_CPU/2ul))
+                {prescaler = 1; pre = 1;}
+        else if (freq < (uint32_t)(F_CPU/2ul) && freq >= (uint32_t)((F_CPU/131072ul)+1ul))
+            {prescaler = 1; pre = 1;}
+        else if (freq < (uint32_t)(F_CPU/16ul) && freq >= (uint32_t)((F_CPU/1048576ul)+1ul))
+            {prescaler = 8; pre = 2;}
+        else if (freq < (uint32_t)(F_CPU/128ul) && freq >= (uint32_t)((F_CPU/8388608ul)+1ul))
+            {prescaler = 64; pre = 3;}
+        else if (freq < (uint32_t)(F_CPU/512ul) && freq >= (uint32_t)1)
+            {prescaler = 256; pre = 4;}
+        else if (freq < 1ul)
+            {prescaler = 1024; pre = 5;}
         
         #if defined(__WAVE_USE_OCR3A)
             OCR3A = (F_CPU / (2ul * prescaler * freq)) - 1ul;
@@ -506,12 +547,18 @@ void waveGenerator3C_set(uint32_t freq)
     // mode 4 or 12 is used depending on the definition in the header file
     if (!g_u8Timer3_flag)
     {
-        if(freq > 8000000ul){prescaler = 1; pre = 1;}
-        else if (freq <= 8000000ul && freq >= 123ul){prescaler = 1; pre = 1;}
-        else if (freq <= 1000000ul && freq >= 16ul){prescaler = 8; pre = 2;}
-        else if (freq <= 125000ul && freq >= 2ul){prescaler = 64; pre = 3;}
-        else if (freq <= 31250ul && freq >= 1ul){prescaler = 256; pre = 4;}
-        else if (freq < 1ul){prescaler = 1024; pre = 5;}
+        if(freq >= (uint32_t)(F_CPU/2ul))
+                {prescaler = 1; pre = 1;}
+        else if (freq < (uint32_t)(F_CPU/2ul) && freq >= (uint32_t)((F_CPU/131072ul)+1ul))
+            {prescaler = 1; pre = 1;}
+        else if (freq < (uint32_t)(F_CPU/16ul) && freq >= (uint32_t)((F_CPU/1048576ul)+1ul))
+            {prescaler = 8; pre = 2;}
+        else if (freq < (uint32_t)(F_CPU/128ul) && freq >= (uint32_t)((F_CPU/8388608ul)+1ul))
+            {prescaler = 64; pre = 3;}
+        else if (freq < (uint32_t)(F_CPU/512ul) && freq >= (uint32_t)1)
+            {prescaler = 256; pre = 4;}
+        else if (freq < 1ul)
+            {prescaler = 1024; pre = 5;}
         
         #if defined(__WAVE_USE_OCR3A)
             OCR3A = (F_CPU / (2ul * prescaler * freq)) - 1ul;

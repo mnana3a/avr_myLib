@@ -4,17 +4,17 @@
 void fastPWM0_init(uint32_t freq)
 {
     // this routine works with non-inverted mode only
-    uint16_t prescaler = 0;
+
     uint8_t pre = 0;
+
+    // freq = F_CPU / (256*Prescaler)
+    // for default value set the freq argument with the value 0 [61 kHz]
     // freq is limited to a specific set of values depending on the chosen prescaler
     // freq = [62500 , 7812.5 , 976.5 , 244.14 , 61]  for atmega32/16
     // freq = [62500 , 7812.5 , 1953 , 976.5 , 488 , 244.14 , 61]  for atmega128
     // select prescaler with the min. possible error margin
     
-    // freq = F_CPU / (256*Prescaler)
-    // for default value set the freq argument with the value 0 [61 kHz]
-    if(freq <= 240){
-        prescaler = 1024;
+    if(freq < 152ul){
         #if defined(__AVR_ATmega16__) || defined(__AVR_ATmega32__)
             pre = 5;
         #elif defined(__AVR_ATmega128__)
@@ -23,34 +23,31 @@ void fastPWM0_init(uint32_t freq)
     }
     else
     {
-        prescaler = F_CPU / (freq * 256);
         // the result is a log curve
         #if defined(__AVR_ATmega16__) || defined(__AVR_ATmega32__)
-            if(prescaler < 1)   pre = 1;
-            else if(prescaler >= 1 && prescaler <= 2)   pre = 1;
-            else if(prescaler > 2 && prescaler <= 14)   pre = 2;
-            else if(prescaler > 14 && prescaler <= 102) pre = 3;
-            else if(prescaler > 102 && prescaler <= 152)    pre = 4;
-            else if(prescaler > 152)   pre = 5;
+            if(freq >= 35156ul)                         pre = 1;
+            else if(freq < 35156ul && freq >= 4394ul)   pre = 2;
+            else if(freq < 4394ul && freq >= 610ul)     pre = 3;
+            else if(freq < 610ul && freq >= 152ul)      pre = 4;
+            else if(freq < 152ul)                       pre = 5;
         #elif defined(__AVR_ATmega128__)
-            if(prescaler < 1)   pre = 1;
-            else if(prescaler >= 1 && prescaler <= 2)   pre = 1;
-            else if(prescaler > 2 && prescaler <= 12)   pre = 2;
-            else if(prescaler > 12 && prescaler <= 42) pre = 3;
-            else if(prescaler > 42 && prescaler <= 85)    pre = 4;
-            else if(prescaler > 85 && prescaler <= 170)   pre = 5;
-            else if(prescaler > 192 && prescaler <= 409)   pre = 6;
-            else if(prescaler > 409)   pre = 7;
+            if(freq >= 35156ul)                         pre = 1;
+            else if(freq < 35156ul && freq >= 4394ul)   pre = 2;
+            else if(freq < 4394ul && freq >= 1464ul)    pre = 3;
+            else if(freq < 1464ul && freq >= 732ul)     pre = 4;
+            else if(freq < 732ul && freq >= 366ul)      pre = 5;
+            else if(freq < 366ul && freq >= 152ul)      pre = 6;
+            else if(freq < 152ul)                       pre = 7;
         #endif
     }
-    // NOTE: should make TCCR0 = not with | as changing the freq would cause error
+    //NOTE : should make TCCR0 = not with | as changing the freq would cause error
     // set the prescaler in the register
     #if defined(__AVR_ATmega16__) || defined(__AVR_ATmega32__) || defined(__AVR_ATmega128__)
         TCCR0 = (1<<3) | (1<<5) | (1<<6) | pre;
     #endif
 
     // 0c0 must be set output
-    W0DDR |= (1<<W0PIN);
+    PWM0DDR |= (1<<PWM0PIN);
     TCNT0 = 0;
 }
 
@@ -81,53 +78,49 @@ void fastPWM0_stop(void)
 void fastPWM2_init(uint32_t freq)
 {
     // this routine works with non-inverted mode only
-    uint16_t prescaler = 0;
     uint8_t pre = 0;
+
+    // freq = F_CPU / (256*Prescaler)
+    // for default value set the freq argument with the value 0 [61 kHz]
     // freq is limited to a specific set of values depending on the chosen prescaler
     // freq = [62500 , 7812.5 , 976.5 , 244.14 , 61]  for atmega32/16
     // freq = [62500 , 7812.5 , 1953 , 976.5 , 488 , 244.14 , 61]  for atmega128
     // select prescaler with the min. possible error margin
     
-    // freq = F_CPU / (256*Prescaler)
-    // for default value set the freq argument with the value 0 [61 kHz]
-    if(freq <= 240){
-        prescaler = 1024;
-        #if defined(__AVR_ATmega128__)
+    if(freq < 152ul){
+        #if defined (__AVR_ATmega128__)
             pre = 5;
-        #elif defined(__AVR_ATmega16__) || defined(__AVR_ATmega32__)
+        #elif defined (__AVR_ATmega16__) || defined(__AVR_ATmega32__)
             pre = 7;
         #endif
     }
     else
     {
-        prescaler = F_CPU / (freq * 256);
         // the result is a log curve
         #if defined(__AVR_ATmega128__)
-            if(prescaler < 1)   pre = 1;
-            else if(prescaler >= 1 && prescaler <= 2)   pre = 1;
-            else if(prescaler > 2 && prescaler <= 14)   pre = 2;
-            else if(prescaler > 14 && prescaler <= 102) pre = 3;
-            else if(prescaler > 102 && prescaler <= 152)    pre = 4;
-            else if(prescaler > 152)   pre = 5;
+            if(freq >= 35156ul)                         pre = 1;
+            else if(freq < 35156ul && freq >= 4394ul)   pre = 2;
+            else if(freq < 4394ul && freq >= 610ul)     pre = 3;
+            else if(freq < 610ul && freq >= 152ul)      pre = 4;
+            else if(freq < 152ul)                       pre = 5;
         #elif defined(__AVR_ATmega16__) || defined(__AVR_ATmega32__)
-            if(prescaler < 1)   pre = 1;
-            else if(prescaler >= 1 && prescaler <= 2)   pre = 1;
-            else if(prescaler > 2 && prescaler <= 12)   pre = 2;
-            else if(prescaler > 12 && prescaler <= 42) pre = 3;
-            else if(prescaler > 42 && prescaler <= 85)    pre = 4;
-            else if(prescaler > 85 && prescaler <= 170)   pre = 5;
-            else if(prescaler > 192 && prescaler <= 409)   pre = 6;
-            else if(prescaler > 409)   pre = 7;
+            if(freq >= 35156ul)                         pre = 1;
+            else if(freq < 35156ul && freq >= 4394ul)   pre = 2;
+            else if(freq < 4394ul && freq >= 1464ul)    pre = 3;
+            else if(freq < 1464ul && freq >= 732ul)     pre = 4;
+            else if(freq < 732ul && freq >= 366ul)      pre = 5;
+            else if(freq < 366ul && freq >= 152ul)      pre = 6;
+            else if(freq < 152ul)                       pre = 7;
         #endif
     }
-    // NOTE: should make TCCR0 = not with | as changing the freq would cause error
+    //NOTE : should make TCCR0 = not with | as changing the freq would cause error
     // set the prescaler in the register
     #if defined(__AVR_ATmega16__) || defined(__AVR_ATmega32__) || defined(__AVR_ATmega128__)
         TCCR2 = (1<<3) | (1<<5) | (1<<6) | pre;
     #endif
 
     // 0c2 must be set output
-    W2DDR |= (1<<W2PIN);
+    PWM2DDR |= (1<<PWM2PIN);
     TCNT2 = 0;
 }
 
@@ -156,8 +149,8 @@ void fastPWM2_stop(void)
 // timer 1
 // OC1A
 
-//FIXME : make the freq float
-//FIXME : change the hardcoded freq numbers into F_CPU/2... freq dependent numbers
+//OPTION : make the freq float
+//NOTE : the hardcoded freq numbers instead of F_CPU/2... for speed purposes
 void fastPWM1A_init(uint32_t freq)
 {
     // control OC1A only

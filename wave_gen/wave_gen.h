@@ -1,11 +1,12 @@
-// TODO: check if float freq required for time1/timer3
+//TODO : check if float freq required for time1/timer3
 
-// NOTE: dont operate oc1c with oc1a or oc1b
-// NOTE: dont operate oc1c with oc2 as they share the same pin
-// NOTE: any module who is common with another and called to function will operate at the same freq its ancestor is operating... if oc1a is on 20hz and called oc1b it will operate on 20 hz regardless of the freq input.. if oc1b isnt called then it wont connect the generator and the pin works as a gpio
+//NOTE : dont operate oc1c with oc1a or oc1b
+//NOTE : dont operate oc1c with oc2 as they share the same pin
+//NOTE : any module who is common with another and called to function will operate at the same freq its ancestor is operating... if oc1a is on 20hz and called oc1b it will operate on 20 hz regardless of the freq input.. if oc1b isnt called then it wont connect the generator and the pin works as a gpio
 
 // the max freq  = F_CPU / 2
-// NOTE: dont try to opertate oc1a & oc1b at the same time, as tcnt1 gets resetted when it first compares to any
+
+//NOTE : dont try to opertate oc1a & oc1b at the same time, as tcnt1 gets resetted when it first compares to any
 // if you try to operate both oc1a & oc1b at the same time only the one with the hightest freq will operate and the second generator will work on that same freq.
 // only intentionally operate both oc1a & oc1b at the saame time if the freq is the exact same for both
 
@@ -18,16 +19,26 @@
 #include <avr/io.h>
 #include <inttypes.h>
 
-// NOTE: added for geany proj plug-in to catch the def and go to the file by pressing on
+//NOTE : added for geany proj plug-in to catch the def and go to the file by pressing on
 // lcd.h
 extern uint8_t wave_gen;
 
 // use only one which isnt conflicting with the rest of the application
 // if icr1 is used in the app use ocr1a for this lib and it works the other way
-#define __WAVE_USE_OCR1A
-//#define __WAVE_USE_ICR1
-#define __WAVE_USE_OCR3A
-//#define __WAVE_USE_ICR3
+#define __WAVE_USE_ICR1
+
+#ifdef __CAP_USE_ICR1
+    #define __WAVE_USE_OCR1A
+    #undef __WAVE_USE_ICR1
+#endif
+
+#if defined(__AVR_ATmega128__)
+    #define __WAVE_USE_ICR3
+    #ifdef __CAP_USE_ICR3
+        #define __WAVE_USE_OCR3A
+        #undef __WAVE_USE_ICR3
+    #endif
+#endif
 
 #if defined(__AVR_ATmega32__) || defined(__AVR_ATmega16__)
     #define W0DDR DDRB

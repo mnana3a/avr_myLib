@@ -44,6 +44,10 @@
 #ifndef __I_CAPTURE_H__
 #define __I_CAPTURE_H__
 
+#ifndef F_CPU
+    #define F_CPU 16000000UL
+#endif
+
 #include <avr/io.h>
 #include <inttypes.h>
 #include <avr/interrupt.h>
@@ -53,14 +57,29 @@
 // lcd.h
 extern uint8_t icapture;
 
-#if defined (__WAVE_USE_ICR1)
-#undef __WAVE_USE_ICR1
-#define __WAVE_USE_OCR1A
+#define __CAP_USE_ICR1
+
+#ifdef __PWM_USE_ICR1
+    #undef __PWM_USE_ICR1
+    #define __PWM_USE_OCR1A
 #endif
 
-#if defined (__PWM_USE_ICR1)
-#undef __PWM_USE_ICR1
-#define __PWM_USE_OCR1A
+#ifdef __WAVE_USE_ICR1
+    #undef __WAVE_USE_ICR1
+    #define __WAVE_USE_OCR1A
+#endif
+
+#if defined(__AVR_ATmega128__)
+    #define __CAP_USE_ICR3
+    #ifdef __PWM_USE_ICR3
+        #undef __PWM_USE_ICR3
+        #define __PWM_USE_OCR3A
+    #endif
+
+    #ifdef __WAVE_USE_ICR3
+        #undef __WAVE_USE_ICR3
+        #define __WAVE_USE_OCR3A
+    #endif
 #endif
 
 #define INTE
@@ -68,9 +87,6 @@ extern uint8_t icapture;
 #define __LO_FREQ           // always use it
 //#define __HI_FREQ     // only use it when the freq is above 1.5 Mhz up to 2 Mhz
 
-#ifndef F_CPU
-    #define F_CPU 16000000UL
-#endif
 //#define SREG (*((volatile uint8_t * const)(0x3f)))
 //char register volatile value asm("r16");
 
