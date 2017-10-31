@@ -1,3 +1,6 @@
+// NOTE : the freq upper limit is F_CPU/2
+// USER : to change the freq, must stop the ocx first then change it
+
 //TODO : check if float freq required for time1/timer3
 
 //NOTE : dont operate oc1c with oc1a or oc1b
@@ -25,7 +28,7 @@ extern uint8_t wave_gen;
 
 // use only one which isnt conflicting with the rest of the application
 // if icr1 is used in the app use ocr1a for this lib and it works the other way
-#define __WAVE_USE_ICR1
+#define __WAVE_USE_OCR1A
 
 #ifdef __CAP_USE_ICR1
     #define __WAVE_USE_OCR1A
@@ -65,6 +68,16 @@ extern uint8_t wave_gen;
 
 #define BUFFER0 5
 #define BUFFER1 7
+
+// these are used to perform division by 10 or 100 without using software divider
+// derived from ((1/100)*2^8)
+#define DIV100_8 3u
+// derived from ((1/100)*2^16)
+#define DIV100_16 656u
+// derived from ((1/10)*2^8)
+#define DIV10_8 26u
+// derived from ((1/10)*2^16)
+#define DIV10_16 6554u
 
 void waveGenerator0_set(uint32_t freq);
 void waveGenerator1A_set(uint32_t freq);
