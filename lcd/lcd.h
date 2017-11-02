@@ -1,4 +1,4 @@
-// 4 bit mode on one port ---> PORTB
+// 4 bit mode on one port
 
 // this header and functions are for 2x16 lcd and other versions require some modifications
 

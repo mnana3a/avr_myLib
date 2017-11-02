@@ -1,3 +1,5 @@
+// USER: if this lib is used and the lcd isnt connected the program stalls as this driver's functions use a reading from the lcd and waits for it
+
 #ifndef __LCD_INTERFACE_H__
 #define __LCD_INTERFACE_H__
 

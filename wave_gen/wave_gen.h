@@ -1,15 +1,15 @@
-// NOTE : the freq upper limit is F_CPU/2
-// USER : to change the freq, must stop the ocx first then change it
+// NOTE: the freq upper limit is F_CPU/2
+// USER: to change the freq, must stop the ocx first then change it
 
-//TODO : check if float freq required for time1/timer3
+// TODO: check if float freq required for time1/timer3
 
-//NOTE : dont operate oc1c with oc1a or oc1b
-//NOTE : dont operate oc1c with oc2 as they share the same pin
-//NOTE : any module who is common with another and called to function will operate at the same freq its ancestor is operating... if oc1a is on 20hz and called oc1b it will operate on 20 hz regardless of the freq input.. if oc1b isnt called then it wont connect the generator and the pin works as a gpio
+// NOTE: dont operate oc1c with oc1a or oc1b
+// NOTE: dont operate oc1c with oc2 as they share the same pin
+// NOTE: any module who is common with another and called to function will operate at the same freq its ancestor is operating... if oc1a is on 20hz and called oc1b it will operate on 20 hz regardless of the freq input.. if oc1b isnt called then it wont connect the generator and the pin works as a gpio
 
 // the max freq  = F_CPU / 2
 
-//NOTE : dont try to opertate oc1a & oc1b at the same time, as tcnt1 gets resetted when it first compares to any
+// NOTE: dont try to opertate oc1a & oc1b at the same time, as tcnt1 gets resetted when it first compares to any
 // if you try to operate both oc1a & oc1b at the same time only the one with the hightest freq will operate and the second generator will work on that same freq.
 // only intentionally operate both oc1a & oc1b at the saame time if the freq is the exact same for both
 
@@ -22,7 +22,7 @@
 #include <avr/io.h>
 #include <inttypes.h>
 
-//NOTE : added for geany proj plug-in to catch the def and go to the file by pressing on
+// NOTE: added for geany proj plug-in to catch the def and go to the file by pressing on
 // lcd.h
 extern uint8_t wave_gen;
 

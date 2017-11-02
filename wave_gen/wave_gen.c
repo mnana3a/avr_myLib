@@ -1,4 +1,4 @@
-//NOTE : this driver has a flaw when the calculated prescaler with/without truncation is one of the acutal prescalers values
+// NOTE: this driver has a flaw when the calculated prescaler with/without truncation is one of the acutal prescalers values
 
 #include "wave_gen.h"
 
@@ -50,7 +50,7 @@ void waveGenerator0_set(uint32_t freq)
             {prescaler = 1024; pre = 7;}
     #endif
     
-    //TODO : change the software division to something else for more performance at initalization time
+    // TODO: change the software division to something else for more performance at initalization time
     OCR0 = (F_CPU / (2ul * prescaler * freq)) - 1ul;
     // set the prescaler in the register
     #if defined(__AVR_ATmega16__) || defined(__AVR_ATmega32__) || defined(__AVR_ATmega128__)
@@ -117,7 +117,7 @@ void waveGenerator2_set(uint32_t freq)
             
         #endif
 
-        //TODO : change the software division to something else for more performance at initalization time
+        // TODO: change the software division to something else for more performance at initalization time
         OCR2 = (F_CPU / (2ul * prescaler * freq)) - 1ul;
         // set the prescaler in the register
         #if defined(__AVR_ATmega16__) || defined(__AVR_ATmega32__) || defined(__AVR_ATmega128__)
@@ -171,14 +171,14 @@ void waveGenerator1A_set(uint32_t freq)
                 {prescaler = 8; pre = 2;}
             else if (freq < (uint32_t)(F_CPU >> 7) && freq >= (uint32_t)((F_CPU >> 23)+1ul))
                 {prescaler = 64; pre = 3;}
-            //FIXME : requires float freq value to be able to generate freq lower than 1 hz
+            // FIXME: requires float freq value to be able to generate freq lower than 1 hz
             else if (freq < (uint32_t)(F_CPU >> 9) && freq >= (uint32_t)1)
                 {prescaler = 256; pre = 4;}
             else if (freq < 1ul)
                 {prescaler = 1024; pre = 5;}
         #endif
 
-        //TODO : change the software division to something else for more performance at initalization time
+        // TODO: change the software division to something else for more performance at initalization time
         #if defined(__WAVE_USE_OCR1A)
             OCR1A = (F_CPU / (2ul * prescaler * freq)) - 1ul;
         #elif defined(__WAVE_USE_ICR1)
@@ -256,14 +256,14 @@ void waveGenerator1B_set(uint32_t freq)
                 {prescaler = 8; pre = 2;}
             else if (freq < (uint32_t)(F_CPU >> 7) && freq >= (uint32_t)((F_CPU >> 23)+1ul))
                 {prescaler = 64; pre = 3;}
-            //FIXME : requires float freq value to be able to generate freq lower than 1 hz
+            // FIXME: requires float freq value to be able to generate freq lower than 1 hz
             else if (freq < (uint32_t)(F_CPU >> 9) && freq >= (uint32_t)1)
                 {prescaler = 256; pre = 4;}
             else if (freq < 1ul)
                 {prescaler = 1024; pre = 5;}
         #endif
 
-        //TODO : change the software division to something else for more performance at initalization time
+        // TODO: change the software division to something else for more performance at initalization time
         #if defined(__WAVE_USE_OCR1A)
             OCR1A = (F_CPU / (2ul * prescaler * freq)) - 1ul;
         #elif defined(__WAVE_USE_ICR1)
@@ -343,13 +343,13 @@ void waveGenerator1C_set(uint32_t freq)
             {prescaler = 8; pre = 2;}
         else if (freq < (uint32_t)(F_CPU >> 7) && freq >= (uint32_t)((F_CPU >> 23)+1ul))
             {prescaler = 64; pre = 3;}
-        //FIXME : requires float freq value to be able to generate freq lower than 1 hz
+        // FIXME: requires float freq value to be able to generate freq lower than 1 hz
         else if (freq < (uint32_t)(F_CPU >> 9) && freq >= (uint32_t)1)
             {prescaler = 256; pre = 4;}
         else if (freq < 1ul)
             {prescaler = 1024; pre = 5;}
 
-        //TODO : change the software division to something else for more performance at initalization time
+        // TODO: change the software division to something else for more performance at initalization time
         #if defined(__WAVE_USE_OCR1A)
             OCR1A = (F_CPU / (2ul * prescaler * freq)) - 1ul;
         #elif defined(__WAVE_USE_ICR1)
@@ -426,13 +426,13 @@ void waveGenerator3A_set(uint32_t freq)
             {prescaler = 8; pre = 2;}
         else if (freq < (uint32_t)(F_CPU >> 7) && freq >= (uint32_t)((F_CPU >> 23)+1ul))
             {prescaler = 64; pre = 3;}
-        //FIXME : requires float freq value to be able to generate freq lower than 1 hz
+        // FIXME: requires float freq value to be able to generate freq lower than 1 hz
         else if (freq < (uint32_t)(F_CPU >> 9) && freq >= (uint32_t)1)
             {prescaler = 256; pre = 4;}
         else if (freq < 1ul)
             {prescaler = 1024; pre = 5;}
 
-        //TODO : change the software division to something else for more performance at initalization time
+        // TODO: change the software division to something else for more performance at initalization time
         #if defined(__WAVE_USE_OCR3A)
             OCR3A = (F_CPU / (2ul * prescaler * freq)) - 1ul;
         #elif defined(__WAVE_USE_ICR3)
@@ -502,13 +502,13 @@ void waveGenerator3B_set(uint32_t freq)
             {prescaler = 8; pre = 2;}
         else if (freq < (uint32_t)(F_CPU >> 7) && freq >= (uint32_t)((F_CPU >> 23)+1ul))
             {prescaler = 64; pre = 3;}
-        //FIXME : requires float freq value to be able to generate freq lower than 1 hz
+        // FIXME: requires float freq value to be able to generate freq lower than 1 hz
         else if (freq < (uint32_t)(F_CPU >> 9) && freq >= (uint32_t)1)
             {prescaler = 256; pre = 4;}
         else if (freq < 1ul)
             {prescaler = 1024; pre = 5;}
 
-        //TODO : change the software division to something else for more performance at initalization time
+        // TODO: change the software division to something else for more performance at initalization time
         #if defined(__WAVE_USE_OCR3A)
             OCR3A = (F_CPU / (2ul * prescaler * freq)) - 1ul;
         #elif defined(__WAVE_USE_ICR3)
@@ -579,13 +579,13 @@ void waveGenerator3C_set(uint32_t freq)
             {prescaler = 8; pre = 2;}
         else if (freq < (uint32_t)(F_CPU >> 7) && freq >= (uint32_t)((F_CPU >> 23)+1ul))
             {prescaler = 64; pre = 3;}
-        //FIXME : requires float freq value to be able to generate freq lower than 1 hz
+        // FIXME: requires float freq value to be able to generate freq lower than 1 hz
         else if (freq < (uint32_t)(F_CPU >> 9) && freq >= (uint32_t)1)
             {prescaler = 256; pre = 4;}
         else if (freq < 1ul)
             {prescaler = 1024; pre = 5;}
 
-        //TODO : change the software division to something else for more performance at initalization time
+        // TODO: change the software division to something else for more performance at initalization time
         #if defined(__WAVE_USE_OCR3A)
             OCR3A = (F_CPU / (2ul * prescaler * freq)) - 1ul;
         #elif defined(__WAVE_USE_ICR3)
