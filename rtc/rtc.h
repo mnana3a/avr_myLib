@@ -9,9 +9,18 @@
 #include <avr/interrupt.h>
 
 // NOTE: added for geany proj plug-in to catch the def and go to the file by pressing on
-// lcd.h
+// rtc.h
 extern uint8_t rtc;
 
-void init_RTC(void);
+#if defined(__AVR_ATmega32__) || defined(__AVR_ATmega16__)
+    #define PC7 TOSC2
+    #define PC6 TOSC1
+#elif defined(__AVR_ATmega128__)
+    #define PG3 TOSC2
+    #define PG4 TOSC1
+#endif
+
+void rtc_init(void);
+void rtc_callbackFn(void (*ptrToRTC_ISR)(void));
 
 #endif

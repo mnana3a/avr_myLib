@@ -1,7 +1,7 @@
 [project]
 name=prj
 description=
-base_path=/home/mnana3a/Documents/AVR/Lib/
+base_path=./
 run_cmd=
 regenerate=true
 type=All

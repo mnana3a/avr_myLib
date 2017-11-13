@@ -20,7 +20,7 @@
 
 #include <inttypes.h>
 #include <avr/io.h>
-#include "rt.h"
+#include "rt/rt.h"
 #ifndef F_CPU
     #define F_CPU 16000000UL
 #endif

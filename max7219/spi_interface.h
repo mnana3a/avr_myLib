@@ -7,7 +7,7 @@
 extern char spi_interface;
 
 // this can be ( 0 , 1 , 2 , 3 )
-#define SPI_MODE_x
+#define SPI_MODE_0
 
 // MODE       : MASTER  -  SLAVE
 // PRESCALE   : 4  -  16  -  64  -  128 (NOTE: using dx to get 2 prescaler isnt stable)
@@ -20,16 +20,16 @@ extern char spi_interface;
 
 
 #define SPI_MODE                SPI_MASTER
-#define SPI_PRESCALE            SPI_FOSC128
+#define SPI_PRESCALE            SPI_FOSC16
 #define SPI_ENABLE              SPI_ON
 #define SPI_SPEED_MODE          SPI_NORMAL
 #define SPI_POLARITY            SPI_IDLE_LOW
 #define SPI_SAMPLE_EDGE         SPI_SAMPLE_LEADING
 #define SPI_INT_ENABLE          SPI_INT_OFF
-#define SPI_DATA_ORDER          SPI_LSB
+#define SPI_DATA_ORDER          SPI_MSB
 
-#define SPI_SS_ACTIVE_LOW
-//#define SPI_SS_ACTIVE_HIGH
+//#define SPI_SS_ACTIVE_LOW
+#define SPI_SS_ACTIVE_HIGH
 
 // uncomment this if you will use interrupt while in slave mode
 //#define INTE

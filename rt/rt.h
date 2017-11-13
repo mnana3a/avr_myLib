@@ -1,5 +1,5 @@
 /*
-*   Function : creates a timer Interrupt every 1 msec that is used for real                          time purposes
+*   Function : creates a timer Interrupt every 1 msec that is used for time purposes
 *   Notes    : it uses TIMER0 CTC Mode for operation
 */
 

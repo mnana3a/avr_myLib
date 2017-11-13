@@ -30,17 +30,27 @@ void spi_init(void)
 {
     if (__config._spi_mode == SPI_MASTER)
     {
-        SPI_DDR |= (1<<SPI_SS);
+        SPI_DDR |= (1<<SPI_SS1);
+        SS_DDR |= (1<<SPI_SS2);
+        SS_DDR |= (1<<SPI_SS3);
         SPI_DDR |= (1<<SPI_SCK);
         SPI_DDR |= (1<<SPI_MOSI);
         SPI_DDR &= ~(1<<SPI_MISO);
         SPI_PORT |= (__config._spi_polarity<<SPI_SCK);
-        SPI_PORT &= ~(1<<SPI_SS);
+        #if defined (SPI_SS_ACTIVE_LOW)
+            SPI_PORT |= (1<<SPI_SS1);
+            SS_PORT |= (1<<SPI_SS2);
+            SS_PORT |= (1<<SPI_SS3);
+        #elif defined (SPI_SS_ACTIVE_HIGH)
+            SPI_PORT &= ~(1<<SPI_SS1);
+            SS_PORT &= ~(1<<SPI_SS2);
+            SS_PORT &= ~(1<<SPI_SS3);
+        #endif
         SPCR |= (__config._spi_prescaler);
     }
     else if (__config._spi_mode == SPI_SLAVE)
     {
-        SPI_DDR &= ~(1<<SPI_SS);
+        SPI_DDR &= ~(1<<SPI_SS1);
         SPI_DDR &= ~(1<<SPI_SCK);
         SPI_DDR &= ~(1<<SPI_MOSI);
         SPI_DDR |= (1<<SPI_MISO);
@@ -99,6 +109,13 @@ uint8_t spi_transfer(uint8_t _data)
     while((SPSR & (1<<SPIF)) == 0);
     _data = SPDR;
     return _data;
+}
+
+void spi_put(uint8_t _data)
+{
+    SPDR = _data;
+    // slave waits here for the master to do the comm
+    while((SPSR & (1<<SPIF)) == 0);
 }
 
 
@@ -169,6 +186,7 @@ static void spi_queue(void)
             else
             {
                 //#error "QUEUE OVERFLOW"
+                // add a separate buffer to copy the current queue into and start receving data into this queue again
             }
         }
     }
@@ -182,6 +200,7 @@ static void spi_queue(void)
         else
         {
             //#error "QUEUE OVERFLOW"
+            // add a separate buffer to copy the current queue into and start receving data into this queue again
         }
     }
 }
@@ -205,20 +224,56 @@ uint8_t spi_trans_multibyte(const unsigned char * ptr, uint8_t argc)
 * */
 
 
-void spi_setSS(void)
+void spi_setSS1(void)
 {
     #if defined (SPI_SS_ACTIVE_LOW)
-        SPI_PORT &= ~(1<<SPI_SS);
+        SPI_PORT &= ~(1<<SPI_SS1);
     #elif defined (SPI_SS_ACTIVE_HIGH)
-        SPI_PORT |= (1<<SPI_SS);
+        SPI_PORT |= (1<<SPI_SS1);
     #endif
 }
 
-void spi_clearSS(void)
+void spi_clearSS1(void)
 {
     #if defined (SPI_SS_ACTIVE_LOW)
-        SPI_PORT |= (1<<SPI_SS);
+        SPI_PORT |= (1<<SPI_SS1);
     #elif defined (SPI_SS_ACTIVE_HIGH)
-        SPI_PORT &= ~(1<<SPI_SS);
+        SPI_PORT &= ~(1<<SPI_SS1);
+    #endif
+}
+
+void spi_setSS2(void)
+{
+    #if defined (SPI_SS_ACTIVE_LOW)
+        SS_PORT &= ~(1<<SPI_SS2);
+    #elif defined (SPI_SS_ACTIVE_HIGH)
+        SS_PORT |= (1<<SPI_SS2);
+    #endif
+}
+
+void spi_clearSS2(void)
+{
+    #if defined (SPI_SS_ACTIVE_LOW)
+        SS_PORT |= (1<<SPI_SS2);
+    #elif defined (SPI_SS_ACTIVE_HIGH)
+        SS_PORT &= ~(1<<SPI_SS2);
+    #endif
+}
+
+void spi_setSS3(void)
+{
+    #if defined (SPI_SS_ACTIVE_LOW)
+        SS_PORT &= ~(1<<SPI_SS3);
+    #elif defined (SPI_SS_ACTIVE_HIGH)
+        SS_PORT |= (1<<SPI_SS3);
+    #endif
+}
+
+void spi_clearSS3(void)
+{
+    #if defined (SPI_SS_ACTIVE_LOW)
+        SS_PORT |= (1<<SPI_SS3);
+    #elif defined (SPI_SS_ACTIVE_HIGH)
+        SS_PORT &= ~(1<<SPI_SS3);
     #endif
 }

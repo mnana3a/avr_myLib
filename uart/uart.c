@@ -6,7 +6,7 @@ volatile static uint8_t g_u8Queue[MAX_UART_BUF_SIZE] = {0};
 
 void uart_init(uint16_t baud)
 {
-    uint16_t baudValue = ((((F_CPU/16UL) + (baud/2)) / (baud)) - 1);
+    uint16_t baudValue = ((((F_CPU >> 4) + (baud >> 1)) / (baud)) - 1);
     UCSRC &= ~(1<<7);
     UBRRH = (uint8_t) (baudValue >> 8);
     UBRRL = (uint8_t) baudValue;
@@ -106,6 +106,7 @@ ISR(USART_RXC_vect)
             else
             {
                 //#error "QUEUE OVERFLOW"
+                // add a separate buffer to copy the current queue into and start receving data into this queue again
             }
         }
     }
@@ -119,6 +120,7 @@ ISR(USART_RXC_vect)
         else
         {
             //#error "QUEUE OVERFLOW"
+            // add a separate buffer to copy the current queue into and start receving data into this queue again
         }
     }
 }
