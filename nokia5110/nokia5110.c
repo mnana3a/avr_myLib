@@ -1,7 +1,13 @@
 #include "nokia5110.h"
 
-uint8_t gu8yLoc = 0;
-uint8_t gu8xLoc = 0;
+
+// USED FOR ANIMATION
+static uint8_t gu8yLoc = 0;
+static uint8_t gu8xLoc = 0;
+
+// USED TO KEEP A RECORD OF THE CURRENT LOCATION MAINLY IN THE DISPLAY BUFFER
+static uint8_t xPos = 0;
+static uint8_t yPos = 0;
 
 uint8_t mapArray[504] = {0x00};
 
@@ -222,13 +228,15 @@ void nokia5110_init(void)
     spi_init();
     gu8xLoc = 0;
     gu8yLoc = 0;
+    xPos = 0;
+    yPos = 0;
     nokia5110_put(LCD_COMMAND, 0x21);  // LCD extended commands
     nokia5110_put(LCD_COMMAND, 0xB3);  // set LCD Vop (contrast)
     nokia5110_put(LCD_COMMAND, 0x04);  // set temp coefficent
     nokia5110_put(LCD_COMMAND, 0x12);  // LCD bias mode 1:48
     nokia5110_put(LCD_COMMAND, 0x20);  // LCD basic commands
     nokia5110_put(LCD_COMMAND, 0x0C);  // LCD normal mode
-    nokia5110_go_xy(0,0);
+    nokia5110_go_yx(0,0);
 }
 
 
@@ -253,7 +261,6 @@ void nokia5110_put(uint8_t command_or_data, const uint8_t __data)
     gu8yLoc = gu8yLoc % 6;
 }
 
-// TODO: add a code to update the buffer with this function
 // NOTE: this limits the no. of chars per line, normal font 14 chars(each 5 pixels) + 14 single pixels = 84 total pixels
 // for bold font 7 char(each 10 pixels) + 14 single pixels = 84 total pixels
 // this is done this way to avoid having chars showing half of it on one line and the rest on another line
@@ -266,27 +273,44 @@ void nokia5110_put_char(uint8_t __character)
         {
             mapArray[(gu8xLoc + (gu8yLoc*LCD_WIDTH))+i] = 0x00;
         }
-        nokia5110_go_xy(0, ++gu8yLoc);
+        nokia5110_go_yx(0, ++gu8yLoc);
         return ;
     } 
     #ifndef __USE_BOLD_FONT
         for (uint8_t i = 0; i < 5; i++)
         {
             column = pgm_read_byte(&ASCII[__character - 0x20][i]);
-            mapArray[gu8xLoc + (gu8yLoc*LCD_WIDTH)] = column;
-            nokia5110_put(LCD_DATA, column);
+            mapArray[xPos + (yPos*LCD_WIDTH)] = column;
+            xPos++;
+            if(xPos >= 84)
+            {
+                xPos = 0;
+                yPos++;
+                xPos++;
+            }
+            yPos = yPos % 6;
         }
-        mapArray[gu8xLoc + (gu8yLoc*LCD_WIDTH)] = 0x00;
-        nokia5110_put(LCD_DATA, 0x00);        // SMALL space between characters
+        mapArray[xPos + (yPos*LCD_WIDTH)] = 0x00;
+        xPos++;
     #else
         for (uint8_t i = 0; i < 10; i++)
         {
             column = pgm_read_byte(&ASCII[__character - 0x20][i]);
-            nokia5110_put(LCD_DATA,  column);
+            mapArray[xPos + (yPos*LCD_WIDTH)] = column;
+            xPos++;
+            if(xPos >= 84)
+            {
+                xPos = 0;
+                yPos++;
+                xPos++;
+            }
+            yPos = yPos % 6;
         } 
-        nokia5110_put(LCD_DATA, 0x00);        // SMALL space between characters
-        nokia5110_put(LCD_DATA, 0x00);        // SMALL space between characters
-    #endif
+        mapArray[xPos + (yPos*LCD_WIDTH)] = 0x00;
+        xPos++;
+        mapArray[xPos + (yPos*LCD_WIDTH)] = 0x00;
+        xPos++;
+    #endif    
 }
 
 // this draws characters as a bitmap so it doesnt keep track of x,y locations
@@ -347,13 +371,13 @@ void nokia5110_clear_display(void)
         mapArray[i] = 0x00;
         nokia5110_put(LCD_DATA, 0x00);
     }
-    nokia5110_go_xy(0,0);
+    nokia5110_go_yx(0,0);
     gu8xLoc = 0;
     gu8yLoc = 0;
 }
 
 // y = 0 : 5 , x = 0 : 83
-void nokia5110_go_xy(uint8_t y, uint8_t x)
+void nokia5110_go_yx(uint8_t y, uint8_t x)
 {
     if (x >= 0 && x <= 83 && y >= 0 && y <= 5)
     {
@@ -361,6 +385,8 @@ void nokia5110_go_xy(uint8_t y, uint8_t x)
         nokia5110_put(LCD_COMMAND, 0x80 | x);  // col
         gu8xLoc = x;
         gu8yLoc = y;
+        xPos = x;
+        yPos = y;
     }
 }
 
@@ -400,7 +426,7 @@ void nokia5110_disp_bitmap(const uint8_t *arrayPtr)
     nokia5110_update_display();
 }
 
-void nokia5110_update_display(void)
+void nokia5110_animate_display(void)
 {
     uint8_t yflag = 0, xflag = 0 , xpos = 0;
     xpos = gu8xLoc;
@@ -430,8 +456,16 @@ void nokia5110_update_display(void)
             yflag = 1;
             xflag = 0;
         }
-        nokia5110_go_xy(gu8yLoc,gu8xLoc);
+        nokia5110_go_yx(gu8yLoc,gu8xLoc);
         nokia5110_put(LCD_DATA, mapArray[i]);
+    }
+}
+
+void nokia5110_update_display(void)
+{
+    for (uint16_t i = 0; i < 504; i++)
+    {
+        nokia5110_put(LCD_DATA, mapArray[gu8xLoc + gu8yLoc*LCD_WIDTH]);
     }
 }
 
@@ -442,7 +476,7 @@ void nokia5110_partialUpdate_display(uint8_t y0, uint8_t x0, uint8_t y1, uint8_t
     uint8_t i;
     uint8_t j;
 
-    nokia5110_go_xy(y0>>3, x0);
+    nokia5110_go_yx(y0>>3, x0);
     for (i = y0; i <= y1; i++)
     {
         for (j = x0; j <= x1; j++)
