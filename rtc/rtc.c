@@ -11,6 +11,11 @@ static void (*RTC_ISR)(void) = (void *) 0;
 
 void rtc_init(void)
 {
+    // delay for the crystal to stablize
+    for (uint8_t i = 0; i <= 255;)
+    {
+        i++;
+    }
     TIMSK = 0;
     ASSR |= (1<<3);     // ASYNCH OP
     #if defined(__AVR_ATmega32__) || defined(__AVR_ATmega16__)

@@ -3,7 +3,7 @@
 #ifndef __LCD_INTERFACE_H__
 #define __LCD_INTERFACE_H__
 
-
+extern uint8_t lcd_interface;
 #define PORTx A
 #define __USE_CUSTOM_CHAR
 

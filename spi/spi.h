@@ -104,7 +104,11 @@ uint8_t spi_transfer(uint8_t _data);
 void spi_put(uint8_t _data);
 uint8_t spi_checkCollision(void);
 void spi_callbackFn(void (*ptrToSPI_ISR)(void));
-void spi_clearSS(void);
-void spi_setSS(void);
+void spi_clearSS1(void);
+void spi_setSS1(void);
+void spi_clearSS2(void);
+void spi_setSS2(void);
+void spi_clearSS3(void);
+void spi_setSS3(void);
 
 #endif

@@ -2,6 +2,8 @@
 #ifndef __KEYPAD_MAP_H__
 #define __KEYPAD_MAP_H__
 
+extern uint8_t keypad_map;
+
 #define ROW1 0
 #define COL1 4
 

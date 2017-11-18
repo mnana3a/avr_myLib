@@ -66,15 +66,44 @@ extern uint8_t uart;
 
 
 void uart_init(uint16_t baud);
+void uart0_init(uint16_t baud);
 
 uint8_t uart_putReady(void);
+uint8_t uart0_putReady(void);
+
 uint8_t uart_getReady(void);
+uint8_t uart0_getReady(void);
+
 void uart_putChar(uint8_t u8data);
+void uart0_putChar(uint8_t u8data);
+
 void uart_putString(const uint8_t * u8SData);
+void uart0_putString(const uint8_t * u8SData);
+
 void  uart_putChar_hex(uint8_t u8data);
+void  uart0_putChar_hex(uint8_t u8data);
+
 void uart_putString_hex(const uint8_t * u8SData);
+void uart0_putString_hex(const uint8_t * u8SData);
 
 uint8_t uart_getChar(void);
+uint8_t uart0_getChar(void);
+
 uint8_t *uart_getString(void);
+uint8_t *uart0_getString(void);
+
+void uart_callbackFn(void (*ptrToUART_ISR)(uint8_t uartx));
+
+#if defined(__AVR_ATmega128__)
+void uart1_init(uint16_t baud);
+uint8_t uart1_putReady(void);
+uint8_t uart1_getReady(void);
+void uart1_putChar(uint8_t u8data);
+void uart1_putString(const uint8_t * u8SData);
+void  uart1_putChar_hex(uint8_t u8data);
+void uart1_putString_hex(const uint8_t * u8SData);
+uint8_t uart1_getChar(void);
+uint8_t *uart1_getString(void);
+#endif
 
 #endif

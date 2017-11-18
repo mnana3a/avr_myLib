@@ -1,0 +1,68 @@
+struct port {
+    void (*dir)(uint8_t pinsBinary, uint8_t inorout);
+    uint8_t (*in_out)(uint8_t y);
+}
+
+
+
+#if defined(__AVR_ATmega16__) || defined(__AVR_ATmega32__)
+    struct port porta = {direction, in_out};
+    struct port portb = {direction, in_out};
+    struct port portc = {direction, in_out};
+    struct port portd = {direction, in_out};
+#elif defined(__AVR_ATmega128__)
+    struct port porta, portb, portc, portd, porte, portf, portg;
+#endif
+
+
+//porta.direction(0b00011010, 0b00011000);      // bit 1,3,4  in, out, out 
+// pinsBinary : can be a single pin, or the binary representation of a sum of pins...
+// inorout    : is the state of this single pin or pins
+void direction(uint8_t pinsBinary, uint8_t inorout)
+{
+    for (uint8_t i = 0; i < 8; i++)
+    {
+        if (pinsBinary & 0x80)
+        {
+            if (inorout & 0x80)
+            {
+                DDRA |= (1<<(7-i));
+            }
+            else
+            {
+                DDRA &= ~(1<<(7-i));
+            }
+        }
+        else
+        {
+            // do nothing
+        }
+        pinsBinary = (pinsBinary << 1);
+        inorout = (inorout << 1);
+    }
+}
+
+
+uint8_t put(uint8_t pinsBinary, uint8_t inorout)
+{
+    direction(pinsBinary, inorout);
+}
+
+
+uint8_t get(uint8_t in)
+{
+    switch (inorout)
+    {
+        case 0:
+            DDRA &= ~(1<<pinsBinary);
+            break;
+        case 1:
+            DDRA |= (1<<pinsBinary);
+            break;
+        default:
+            _tmp = pinsBinary & inorout; 
+            DDRA |= _tmp; 
+            break;
+    }
+}
+
