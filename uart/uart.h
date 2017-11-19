@@ -52,7 +52,7 @@
 // uart.h
 extern uint8_t uart;
 
-#define INTE
+//#define INTE
 
 #define TERMINATOR1 '\n'
 #define TERMINATOR2 '\r'

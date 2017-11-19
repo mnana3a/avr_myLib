@@ -4,7 +4,7 @@
 // USER: all functions now adjusts the display buffer and to show the effect you have to update the display
 // USER: when doing a moving bitmap animation use " animate_display() "
 // USER: " update_display() " only does static image as it puts buffer[0] at address 0 and so on
-
+// USER: " partialUpdate_display() " updates only a portion of the display.but, faster than full update
 
 // NOTE: in case of the pixels constrast isnt right change both bias and vop until you get the required
 

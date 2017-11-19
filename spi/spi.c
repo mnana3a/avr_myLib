@@ -10,9 +10,10 @@ volatile static uint8_t g_u8Queue[MAX_SPI_BUF_SIZE] = {0};
 #ifdef INTE
     static void spi_queue(void);
     static void (*SPI_ISR)(void) = spi_queue;
+#else
+    static void (*SPI_ISR)(void) = (void *) 0;
 #endif
 
-static void (*SPI_ISR)(void) = (void *) 0;
 
 struct spi_config __config = 
 {

@@ -7,6 +7,8 @@ volatile static uint8_t g_u8Queue[MAX_UART_BUF_SIZE] = {0};
 #ifdef INTE
     static void uart_queue(uint8_t uartx);
     static void (*UART_ISR)(uint8_t uartx) = uart_queue;
+#else
+    static void (*UART_ISR)(uint8_t uartx) = (void *)0;
 #endif
 
 // wrapper functions for atmega32/16
@@ -429,7 +431,7 @@ uint8_t *uart0_getString(void)
         uint8_t i=0;
         while(1){
             *(recievedString + i) = uart_getChar();
-            if(*(recievedString+i) == TERMINATOR || i > MAX_UART_BUF_SIZE)
+            if(*(recievedString+i) == TERMINATOR1 || *(recievedString+i) == TERMINATOR2 || i > MAX_UART_BUF_SIZE)
                 break;
             else
                 i++;
@@ -441,7 +443,7 @@ uint8_t *uart0_getString(void)
         uint8_t i=0;
         while(1){
             *(recievedString + i) = uart0_getChar();
-            if(*(recievedString+i) == TERMINATOR || i > MAX_UART_BUF_SIZE)
+            if(*(recievedString+i) == TERMINATOR1 || *(recievedString+i) == TERMINATOR2 || i > MAX_UART_BUF_SIZE)
                 break;
             else
                 i++;
@@ -472,7 +474,7 @@ uint8_t *uart1_getString(void)
         uint8_t i=0;
         while(1){
             *(recievedString + i) = uart1_getChar();
-            if(*(recievedString+i) == TERMINATOR || i > MAX_UART_BUF_SIZE)
+            if(*(recievedString+i) == TERMINATOR1 || *(recievedString+i) == TERMINATOR2 || i > MAX_UART_BUF_SIZE)
                 break;
             else
                 i++;

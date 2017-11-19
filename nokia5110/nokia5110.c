@@ -469,20 +469,15 @@ void nokia5110_update_display(void)
     }
 }
 
-// TODO: not finished
 // this updates only a specific part of the display such as after set_char() we only need to update small portion of the screen
 void nokia5110_partialUpdate_display(uint8_t y0, uint8_t x0, uint8_t y1, uint8_t x1)
 {
-    uint8_t i;
-    uint8_t j;
+    uint16_t j = x0 + (y0>>3)*LCD_WIDTH;
 
     nokia5110_go_yx(y0>>3, x0);
-    for (i = y0; i <= y1; i++)
+    for (uint16_t i = 0; i < (y1-y0)*(x1-x0); i++)
     {
-        for (j = x0; j <= x1; j++)
-        {
-            nokia5110_put(LCD_DATA, mapArray[i*j]);
-        }
+        nokia5110_put(LCD_DATA, mapArray[j++]);
     }
 }
 
