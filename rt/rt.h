@@ -18,6 +18,7 @@
 extern uint8_t rt;
 
 #define MILLIS __time
+#define MILLIS() __time
 
 #ifndef __GNUC__
 #define __inline__ inline
